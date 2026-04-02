@@ -1,0 +1,81 @@
+{
+  "tagline": "Ambientes que expressam quem você é.",
+  "manifesto": {
+    "headline": "Ambientes que não precisam se explicar.",
+    "body": "NOCE nasceu da convicção de que o espaço planejado não é sobre móveis — é sobre quem você escolheu ser. Com 17 anos de experiência, desenvolvemos projetos exclusivos para um público que espera consultoria real, materiais nobres e execução milimétrica."
+  },
+  "sections": {
+    "cozinha": {
+      "label": "COZINHA",
+      "headline": "O coração da casa, projetado com intenção.",
+      "images": []
+    },
+    "living": {
+      "label": "ESTAR & LIVING", 
+      "headline": "O lugar onde você simplesmente respira.",
+      "images": []
+    },
+    "closet": {
+      "label": "DORMITÓRIO & CLOSET",
+      "headline": "O espaço mais íntimo merece o cuidado mais preciso.",
+      "images": []
+    },
+    "banheiro": {
+      "label": "BANHEIRO & LAVABO",
+      "headline": "Nos menores espaços, o maior cuidado com os detalhes.",
+      "images": []
+    },
+    "corporativo": {
+      "label": "CORPORATIVO",
+      "headline": "Ambientes de trabalho que comunicam antes de você falar.",
+      "images": []
+    }
+  },
+  "acabamentos": {
+    "label": "MATERIALIDADE",
+    "headline": "Uma curadoria de acabamentos nobres.",
+    "items": [
+      {"name": "Extra Bianco", "image": ""},
+      {"name": "Linea Sabbia", "image": ""},
+      {"name": "Linea Nocciola", "image": ""},
+      {"name": "Linea Murano", "image": ""},
+      {"name": "Linea Noce", "image": ""},
+      {"name": "Linea Oliva", "image": ""},
+      {"name": "Vanilla Metallizzato", "image": ""},
+      {"name": "Carvalho Natural", "image": ""},
+      {"name": "Cinâmomo", "image": ""},
+      {"name": "Imbuia", "image": ""},
+      {"name": "Louro Freijó", "image": ""},
+      {"name": "Carvalho Americano", "image": ""},
+      {"name": "Guida", "image": ""},
+      {"name": "Macchiato", "image": ""},
+      {"name": "Sisal", "image": ""},
+      {"name": "Tratti", "image": ""},
+      {"name": "Audace", "image": ""},
+      {"name": "Rosa Bella", "image": ""},
+      {"name": "Cielo", "image": ""},
+      {"name": "Bianco TX", "image": ""},
+      {"name": "Noce Freijó MDP", "image": ""}
+    ]
+  },
+  "parceiros": {
+    "label": "PARCEIROS",
+    "headline": "Marcas que confiam na excelência.",
+    "items": [
+      {"name": "Villaggio", "image": ""},
+      {"name": "ZEN", "image": ""},
+      {"name": "Blum", "image": ""},
+      {"name": "PER FAR", "image": ""}
+    ]
+  },
+  "cta": {
+    "headline": "Vamos criar o seu ambiente?",
+    "whatsapp": "5511965665065",
+    "instagram": "nocemobili"
+  },
+  "instagram": {
+    "username": "nocemobili",
+    "token": "",
+    "show": true
+  }
+}

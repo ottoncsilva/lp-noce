@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOCE mobili | Ambientes que expressam quem você é</title>
+    <meta name="description" content="Studio de consultoria de ambientes planejados ultra-premium em Alphaville, São Paulo. 17 anos de experiência em projetos exclusivos.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-green-dark: #233728;
+            --color-black: #231d1b;
+            --color-gray-medium: #6b6b6b;
+            --color-gray-light: #e6e6e6;
+            --color-white: #ffffff;
+            
+            --font-display: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        /* CSS Reset & General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 300;
+            color: var(--color-black);
+            background-color: var(--color-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, h6, .display-font {
+            font-family: var(--font-display);
+            font-weight: 300;
+            line-height: 1.2;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Typography Utilities */
+        .label {
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .headline-large {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            letter-spacing: 0.02em;
+            margin-bottom: 2rem;
+        }
+
+        .headline-medium {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .body-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 600px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--color-gray-light);
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        /* Layout Utilities */
+        .section-padding {
+            padding: 10rem 5%;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.215, 0.61, 0.355, 1), transform 1s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes kenburns {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            z-index: 100;
+            transition: all 0.4s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav.scrolled {
+            background-color: rgba(255, 255, 255, 0.98);
+            padding: 1rem 5%;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+            color: var(--color-black);
+        }
+
+        nav .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            color: var(--color-white);
+            transition: color 0.4s ease;
+        }
+
+        nav.scrolled .logo {
+            color: var(--color-black);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 1px;
+            background-color: var(--color-white);
+            transition: all 0.3s;
+        }
+
+        nav.scrolled .hamburger span {
+            background-color: var(--color-black);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .nav-links a {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-white);
+            transition: color 0.4s ease;
+        }
+
+        nav.scrolled .nav-links a {
+            color: var(--color-black);
+        }
+
+        /* 1. HERO SECTION */
+        .hero {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--color-white);
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            animation: kenburns 20s ease-out infinite alternate;
+            z-index: 1;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(35, 29, 27, 0.3); /* Dark overlay 30% */
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 800px;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-logo {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 6rem);
+            letter-spacing: 0.15em;
+            margin-bottom: 2rem;
+        }
+
+        .hero-divider {
+            width: 60px;
+            height: 1px;
+            background-color: var(--color-white);
+            margin: 0 auto 2rem;
+        }
+
+        .hero-tagline {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            letter-spacing: 0.05em;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0.7;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background-color: var(--color-white);
+        }
+
+        /* 2. MANIFESTO */
+        .manifesto {
+            background-color: var(--color-white);
+            display: flex;
+            justify-content: center;
+        }
+
+        .manifesto-content {
+            max-width: 900px;
+            width: 100%;
+            padding-left: 20%;
+        }
+
+        .manifesto .body-text {
+            color: var(--color-gray-medium);
+            max-width: 500px;
+        }
+
+        /* 3. DIFERENCIAIS */
+        .diferenciais {
+            background-color: var(--color-green-dark);
+            color: var(--color-white);
+        }
+
+        .diferenciais-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4rem;
+        }
+
+        .diferencial-item {
+            position: relative;
+        }
+
+        .diferencial-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -2rem;
+            width: 1px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .diferencial-item .label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .diferencial-item h3 {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* 4 & 5. SPLIT SECTIONS (COZINHA / LIVING) */
+        .split-section {
+            display: flex;
+            min-height: 90vh;
+        }
+
+        .split-section.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .split-photo {
+            flex: 0 0 60%;
+            position: relative;
+        }
+
+        .split-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .split-content {
+            flex: 0 0 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5rem 8%;
+        }
+
+        /* 6. DORMITÓRIO & CLOSET */
+        .full-width-overlay {
+            position: relative;
+            height: 90vh;
+        }
+
+        .full-width-overlay > img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay-box {
+            position: absolute;
+            bottom: 5rem;
+            left: 5rem;
+            background-color: rgba(35, 29, 27, 0.85); /* Semi-dark */
+            color: var(--color-white);
+            padding: 4rem;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+        }
+
+        .overlay-box .label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 7. BANHEIRO & LAVABO */
+        .split-grid {
+            display: flex;
+            align-items: center;
+        }
+
+        .grid-photos {
+            flex: 0 0 60%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 90vh;
+        }
+
+        .grid-photos img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 8. CORPORATIVO */
+        .corporativo {
+            background-color: var(--color-black);
+            color: var(--color-white);
+            position: relative;
+            height: 90vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .corporativo-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+        }
+
+        .corporativo-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 10%;
+            max-width: 800px;
+        }
+
+        /* 9. MATERIALIDADE */
+        .materialidade {
+            background-color: var(--color-white);
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 6rem;
+        }
+
+        .material-item {
+            aspect-ratio: 1;
+            position: relative;
+        }
+
+        .material-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .material-name {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--color-gray-medium);
+        }
+
+        /* 10. PROCESSO */
+        .processo {
+            background-color: var(--color-white);
+            padding-bottom: 12rem;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 6rem;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--color-gray-light);
+            z-index: 0;
+        }
+
+        .timeline-step {
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-dot {
+            width: 30px;
+            height: 30px;
+            background-color: var(--color-white);
+            border: 1px solid var(--color-black);
+            border-radius: 50%;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+        }
+
+        .step-title {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .step-desc {
+            font-size: 0.95rem;
+            color: var(--color-gray-medium);
+            line-height: 1.6;
+        }
+
+        /* 11. CTA / CONTATO */
+        .cta {
+            background-color: var(--color-green-dark);
+            color: var(--color-white);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .buttons-wrap {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 4rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--color-white);
+            color: var(--color-green-dark);
+        }
+
+        /* 12. FOOTER */
+        .footer {
+            background-color: var(--color-black);
+            color: var(--color-gray-light);
+            padding: 4rem 5%;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            color: var(--color-white);
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--color-white);
+        }
+
+        /* WHATSAPP FLOAT */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background-color: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            transform: translateY(20px);
+        }
+
+        .whatsapp-float.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .whatsapp-float svg {
+            width: 30px;
+            height: 30px;
+            fill: currentColor;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .section-padding { padding: 6rem 5%; }
+            .diferenciais-grid { gap: 2rem; }
+            .diferencial-item:not(:last-child)::after { right: -1rem; }
+            .materials-grid { grid-template-columns: repeat(2, 1fr); }
+            .split-content { padding: 4rem 5%; }
+            .manifesto-content { padding-left: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100vw;
+                height: 100vh;
+                background-color: var(--color-white);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.4s ease;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                color: var(--color-black);
+                font-size: 1.2rem;
+            }
+
+            .hamburger { display: flex; z-index: 101; }
+            .hamburger.active span { background-color: var(--color-black); }
+            .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+            .diferenciais-grid { grid-template-columns: 1fr; gap: 4rem; }
+            .diferencial-item:not(:last-child)::after {
+                width: 100%; height: 1px; top: auto; bottom: -2rem; right: 0;
+            }
+
+            .split-section, .split-section.reverse {
+                flex-direction: column;
+            }
+            .split-photo { height: 60vh; }
+
+            .split-grid { flex-direction: column-reverse; }
+            .grid-photos { grid-template-columns: 1fr; height: 100vh; width: 100%; }
+
+            .overlay-box {
+                bottom: 0; left: 0; width: 100%; padding: 3rem 2rem;
+            }
+
+            .timeline { grid-template-columns: 1fr; gap: 4rem; }
+            .timeline::before {
+                width: 1px; height: 100%; left: 15px; top: 0;
+            }
+
+            .buttons-wrap { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav id="navbar">
+        <a href="#" class="logo">NOCE</a>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="#sobre">Sobre Nós</a>
+            <a href="#diferenciais">Diferenciais</a>
+            <a href="#portfolio">Portfólio</a>
+            <a href="#processo">Processo</a>
+            <a href="#contato">Contato</a>
+        </div>
+    </nav>
+
+    <!-- 1. HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content fade-in">
+            <div class="hero-logo">NOCE</div>
+            <div class="hero-divider"></div>
+            <div class="hero-tagline">Ambientes que expressam quem você é.</div>
+        </div>
+        <div class="scroll-indicator">
+            <span class="label" style="margin:0; font-size:0.6rem;">Explore</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- 2. MANIFESTO -->
+    <section id="sobre" class="manifesto section-padding container">
+        <div class="manifesto-content fade-in">
+            <span class="label">Sobre Nós</span>
+            <h2 class="headline-large">Ambientes que não precisam se explicar.</h2>
+            <div class="divider"></div>
+            <p class="body-text">
+                NOCE nasceu da convicção de que o espaço planejado não é sobre móveis — é sobre quem você escolheu ser. Com 17 anos de experiência, desenvolvemos projetos exclusivos para um público que espera consultoria real, materiais nobres e execução milimétrica.
+            </p>
+        </div>
+    </section>
+
+    <!-- 3. DIFERENCIAIS -->
+    <section id="diferenciais" class="diferenciais section-padding">
+        <div class="container">
+            <div class="diferenciais-grid fade-in">
+                <div class="diferencial-item">
+                    <span class="label">Consultoria Real</span>
+                    <h3>Escutamos antes de projetar.</h3>
+                </div>
+                <div class="diferencial-item">
+                    <span class="label">Curadoria de Materiais</span>
+                    <h3>MDF em cores, texturas e madeiras que envelhecem com beleza.</h3>
+                </div>
+                <div class="diferencial-item">
+                    <span class="label">Execução Milimétrica</span>
+                    <h3>Do projeto ao acabamento, cada detalhe revisado.</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. COZINHA -->
+    <section id="portfolio" class="split-section">
+        <div class="split-photo">
+            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=1920" alt="Cozinha premium planejada" loading="lazy">
+        </div>
+        <div class="split-content fade-in">
+            <span class="label">Cozinha</span>
+            <h2 class="headline-medium">O coração da casa, projetado com intenção.</h2>
+            <p class="body-text">Cada cozinha NOCE é desenvolvida para a forma como você realmente vive — não para como uma loja imagina que você vive.</p>
+        </div>
+    </section>
+
+    <!-- 5. LIVING -->
+    <section class="split-section reverse">
+        <div class="split-photo">
+            <img src="https://images.unsplash.com/photo-1600607687983-a0e4472d80d2?q=80&w=1920" alt="Living room panel wood" loading="lazy">
+        </div>
+        <div class="split-content fade-in">
+            <span class="label">Estar & Living</span>
+            <h2 class="headline-medium">O lugar onde você simplesmente respira.</h2>
+        </div>
+    </section>
+
+    <!-- 6. DORMITÓRIO & CLOSET -->
+    <section class="full-width-overlay">
+        <img src="https://images.unsplash.com/photo-1620626011761-996317b8b7ed?q=80&w=1920" alt="Closet premium" loading="lazy">
+        <div class="overlay-box fade-in">
+            <span class="label">Dormitório & Closet</span>
+            <h2 class="headline-medium" style="margin-bottom:0;">O espaço mais íntimo merece o cuidado mais preciso.</h2>
+        </div>
+    </section>
+
+    <!-- 7. BANHEIRO & LAVABO -->
+    <section class="split-grid">
+        <div class="split-content fade-in" style="flex: 0 0 40%;">
+            <span class="label">Banheiro & Lavabo</span>
+            <h2 class="headline-medium">Nos menores espaços, o maior cuidado com os detalhes.</h2>
+        </div>
+        <div class="grid-photos">
+            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000" alt="Banheiro detalhe 1" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=1000" alt="Banheiro detalhe 2" loading="lazy">
+        </div>
+    </section>
+
+    <!-- 8. CORPORATIVO -->
+    <section class="corporativo">
+        <div class="corporativo-bg"></div>
+        <div class="corporativo-content fade-in">
+            <span class="label">Corporativo</span>
+            <h2 class="headline-medium">Ambientes de trabalho que comunicam antes de você falar.</h2>
+        </div>
+    </section>
+
+    <!-- 9. MATERIALIDADE -->
+    <section class="materialidade section-padding container">
+        <div class="fade-in">
+            <span class="label">Materialidade</span>
+            <h2 class="headline-medium">Uma curadoria de acabamentos nobres.</h2>
+            <p class="body-text">Mais de 30 acabamentos em MDF — cores, texturas e madeiras selecionadas para compor o ambiente exato que você imagina.</p>
+        </div>
+        <div class="materials-grid fade-in">
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1588880331179-1341e4da2afc?q=80&w=800" alt="Wood texture 1" loading="lazy">
+                <span class="material-name">Nogueira Escura</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1616428236746-b3aa728bbad6?q=80&w=800" alt="Wood texture 2" loading="lazy">
+                <span class="material-name">Carvalho Natural</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=800" alt="Stone texture" loading="lazy">
+                <span class="material-name">Basalto Carbon</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1618219740975-d40978bb7378?q=80&w=800" alt="Matte surface" loading="lazy">
+                <span class="material-name">Verde Oliva Matte</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1522079010505-64f331dff710?q=80&w=800" alt="Wood texture 3" loading="lazy">
+                <span class="material-name">Freijó</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1632932371900-2f9cdb84fde9?q=80&w=800" alt="Cement texture" loading="lazy">
+                <span class="material-name">Cimento Queimado</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1533036430335-7c010fc22247?q=80&w=800" alt="Fabric texture" loading="lazy">
+                <span class="material-name">Trama Linho</span>
+            </div>
+            <div class="material-item">
+                <img src="https://images.unsplash.com/photo-1588880331604-ece6bd15609e?q=80&w=800" alt="Wood texture dark" loading="lazy">
+                <span class="material-name">Ébano Mônaco</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. PROCESSO -->
+    <section id="processo" class="processo section-padding container">
+        <div class="fade-in">
+            <span class="label">Metodologia</span>
+            <h2 class="headline-medium">Nosso Processo</h2>
+        </div>
+        <div class="timeline fade-in">
+            <div class="timeline-step">
+                <div class="step-dot">1</div>
+                <h4 class="step-title">Escuta</h4>
+                <p class="step-desc">Entendemos sua rotina e espaço.</p>
+            </div>
+            <div class="timeline-step">
+                <div class="step-dot">2</div>
+                <h4 class="step-title">Curadoria</h4>
+                <p class="step-desc">Selecionamos materiais sob medida.</p>
+            </div>
+            <div class="timeline-step">
+                <div class="step-dot">3</div>
+                <h4 class="step-title">Projeto</h4>
+                <p class="step-desc">Cada detalhe desenvolvido com você.</p>
+            </div>
+            <div class="timeline-step">
+                <div class="step-dot">4</div>
+                <h4 class="step-title">Entrega</h4>
+                <p class="step-desc">Acompanhamento completo da instalação.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. CTA / CONTATO -->
+    <section id="contato" class="cta section-padding">
+        <div class="container fade-in">
+            <h2 class="headline-large">Vamos criar o seu ambiente?</h2>
+            <p class="body-text" style="margin: 0 auto; color: rgba(255,255,255,0.8);">Studio de Consultoria de Ambientes Planejados<br>Alphaville · São Paulo</p>
+            
+            <div class="buttons-wrap">
+                <a href="https://wa.me/5511965665065" target="_blank" class="btn">Falar no WhatsApp</a>
+                <a href="https://instagram.com/nocemobili" target="_blank" class="btn">Ver no Instagram</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. FOOTER -->
+    <footer class="footer">
+        <div class="footer-logo">NOCE</div>
+        <p>© 2025 NOCE mobili. Todos os direitos reservados.</p>
+        <div class="footer-links">
+            <a href="https://instagram.com/nocemobili" target="_blank">Instagram: @nocemobili</a>
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOAT SECTION -->
+    <a href="https://wa.me/5511965665065" target="_blank" class="whatsapp-float" aria-label="Fale conosco no WhatsApp">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+        </svg>
+    </a>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar Scroll Effect
+            const navbar = document.getElementById('navbar');
+            const whatsappFloat = document.querySelector('.whatsapp-float');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+
+                // Show WhatsApp float after first scroll down (vh)
+                if (window.scrollY > window.innerHeight / 2) {
+                    whatsappFloat.classList.add('visible');
+                } else {
+                    whatsappFloat.classList.remove('visible');
+                }
+            });
+
+            // Mobile Menu Toggle
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+            const navItems = navLinks.querySelectorAll('a');
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+
+            // Scroll Animation Observer (Fade in sections)
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>
