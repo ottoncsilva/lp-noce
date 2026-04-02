@@ -18,7 +18,17 @@ function buildUI() {
     // GERAL PANEL
     container.insertAdjacentHTML('beforeend', `
         <div class="panel active" id="panel-geral">
-            <h3>Textos Principais</h3>
+            <h3>Visual & Textos Globais</h3>
+            <div class="form-group" style="padding: 15px; border: 1px solid #333; margin-bottom: 2rem;">
+                <label>Logotipo Oficial da NOCE (Header / Hero)</label>
+                <div style="display:flex; gap: 15px; align-items:center; margin-top: 10px;">
+                    <img id="preview-logo" src="${siteData.logo || ''}" style="height: 50px; background:#e6e6e6; padding: 5px; border-radius: 4px;">
+                    <input type="file" id="file-logo" accept="image/*" style="display:none" onchange="uploadLogoGlobal(event)">
+                    <button class="btn" style="padding: 10px 20px; cursor: pointer;" onclick="document.getElementById('file-logo').click()">Upload Nova Logo</button>
+                    <button class="btn btn-delete" style="padding: 10px 20px;" onclick="removeLogoGlobal()">Remover</button>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Tagline (Hero)</label>
                 <input type="text" id="inp-tagline" value="${siteData.tagline}">
@@ -72,7 +82,10 @@ function buildUI() {
 
                 ${isList ? `
                 <div class="form-group">
-                    <label>Itens (${secName === 'parceiros' ? 'Parceiros' : 'Acabamentos'})</label>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <label style="margin:0;">Itens (${secName === 'parceiros' ? 'Parceiros' : 'Acabamentos'})</label>
+                        <button class="btn" style="padding:5px 15px; cursor:pointer;" onclick="addNewItem('${secName}')">+ ADICIONAR NOVO</button>
+                    </div>
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         ${sec.items.map((item, idx) => `
                             <div style="border:1px solid #ccc; padding:10px; display:flex; gap:10px; align-items:center;">
@@ -84,6 +97,7 @@ function buildUI() {
                                         <input type="file" id="fi-${secName}-${idx}" accept="image/*" style="display:none" onchange="uploadItemImage(event, '${secName}', ${idx})">
                                         <button type="button" onclick="document.getElementById('fi-${secName}-${idx}').click()" style="padding:5px 10px; font-size:11px; cursor:pointer;">Fazer Upload</button>
                                         <input type="text" value="${item.image || ''}" onchange="updateItemImage('${secName}', ${idx}, this.value)" placeholder="URL (opcional)" style="flex:1; font-size:11px;">
+                                        <button class="btn-delete" style="padding:5px 10px; font-size:11px;" onclick="deleteItem('${secName}', ${idx})">X</button>
                                     </div>
                                 </div>
                             </div>
@@ -279,4 +293,59 @@ async function uploadItemImage(e, section, index) {
     } catch(err) {
         alert("Erro no upload do item");
     }
+}
+
+// Adicionar / Remover Itens dinâmicos
+async function addNewItem(section) {
+    const list = siteData.sections[section] ? siteData.sections[section].items : siteData[section].items;
+    list.push({ name: "Novo Item", image: "" });
+    await saveContent(false);
+    buildUI();
+    setupTabs();
+    document.querySelector(`.tab[data-target="${section}"]`).click();
+}
+
+async function deleteItem(section, index) {
+    if(!confirm("Remover este item definitivamente?")) return;
+    const list = siteData.sections[section] ? siteData.sections[section].items : siteData[section].items;
+    list.splice(index, 1);
+    await saveContent(false);
+    buildUI();
+    setupTabs();
+    document.querySelector(`.tab[data-target="${section}"]`).click();
+}
+
+// Upload de Logotipo Global da NOCE
+async function uploadLogoGlobal(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+
+    showToast("Subindo logotipo oficial...");
+    const formData = new FormData();
+    formData.append('photos', file);
+
+    try {
+        const res = await fetch(`/api/upload/corporativo`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        
+        if(data.success && data.files.length > 0) {
+            siteData.logo = data.files[0];
+            await saveContent(false);
+            buildUI();
+            setupTabs();
+            showToast("Logotipo Oficial Atualizado!");
+        }
+    } catch(err) {
+        alert("Erro no upload do logotipo");
+    }
+}
+
+async function removeLogoGlobal() {
+    siteData.logo = "";
+    await saveContent(false);
+    buildUI();
+    setupTabs();
 }

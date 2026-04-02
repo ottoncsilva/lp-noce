@@ -79,7 +79,7 @@ html.lenis { height: auto; }
 
 /* HERO */
 .hero {
-    background: var(--noce-black);
+    background: var(--noce-green);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -111,6 +111,8 @@ html.lenis { height: auto; }
     letter-spacing: 0.25em;
     text-transform: uppercase;
     margin-top: 1rem;
+    padding: 0 10vw;
+    line-height: 1.6;
 }
 
 /* MANIFESTO */
@@ -136,7 +138,7 @@ html.lenis { height: auto; }
 .ambiente-pin-wrap {
     height: 100vh;
     display: flex;
-    background: var(--noce-black);
+    background: var(--noce-green);
     color: var(--noce-white);
     position: relative;
     overflow: hidden;
@@ -257,7 +259,7 @@ html.lenis { height: auto; }
 
 /* PARCEIROS (Spotlight) */
 .parceiros-sec {
-    background: var(--noce-black);
+    background: var(--noce-green);
     color: var(--noce-white);
     position: relative;
 }
@@ -271,13 +273,13 @@ html.lenis { height: auto; }
     padding-top: 50vh; padding-bottom: 50vh;
 }
 .parc-logo {
-    width: 300px; height: auto; margin: 20vh 0;
-    opacity: 0.1; filter: grayscale(100%);
+    width: 200px; max-width: 40vw; height: auto; margin: 15vh 0;
+    opacity: 0.2; filter: grayscale(100%);
     transition: all 0.5s;
 }
 .parc-logo.active {
     opacity: 1; filter: grayscale(0%);
-    transform: scale(1.1);
+    transform: scale(1.05); /* Escala reduzida também na ativação */
 }
 
 /* INSTAGRAM */

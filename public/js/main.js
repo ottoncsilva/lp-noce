@@ -24,8 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function populateDOM(data) {
+        // Logo images
+        const logoUrl = data.logo || '/images/placeholder.jpg';
+        document.querySelectorAll('.main-logo-img').forEach(el => el.src = logoUrl);
+
         // Hero
-        document.querySelector('.hero-logo').textContent = 'NOCE'; // NOCE
         document.querySelector('.hero-tagline').textContent = data.tagline;
 
         // Manifesto
