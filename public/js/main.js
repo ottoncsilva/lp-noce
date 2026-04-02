@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelectorAll('.main-logo-img').forEach(el => el.src = logoUrl);
 
         // Hero
+        if(data.heroBg) {
+            document.querySelector('.hero-bg').style.backgroundImage = `url('${data.heroBg}')`;
+        }
         document.querySelector('.hero-tagline').textContent = data.tagline;
 
         // Manifesto

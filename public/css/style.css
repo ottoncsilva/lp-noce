@@ -11,9 +11,41 @@
     --font-body: 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Aktiv Grotesk — Tipografia Oficial Noce Mobili */
 @font-face {
     font-family: 'Aktiv Grotesk';
-    src: local('Helvetica Neue'); /* Fallback luxuoso para Mac enquanto aguardamos as fontes originais */
+    src: url('/fonts/AktivGrotesk-Hairline.otf') format('opentype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Aktiv Grotesk';
+    src: url('/fonts/AktivGrotesk-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Aktiv Grotesk';
+    src: url('/fonts/AktivGrotesk-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Aktiv Grotesk';
+    src: url('/fonts/AktivGrotesk-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Aktiv Grotesk';
+    src: url('/fonts/AktivGrotesk-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -211,8 +243,9 @@ html.lenis { height: auto; }
     padding: 10vh 0;
 }
 .section-entry-word {
-    text-align: center; font-size: 8vw;
-    font-weight: 300; color: var(--noce-black);
+    text-align: center; font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 100; color: var(--noce-black);
+    letter-spacing: 0.05em;
     margin-bottom: 10vh;
 }
 .acabamentos-wrapper {
@@ -243,7 +276,7 @@ html.lenis { height: auto; }
     color: var(--noce-white);
     display: flex; flex-direction: column; justify-content: center;
 }
-.proc-head { text-align: center; margin-bottom: 4rem; font-size: 3rem; font-weight: 300;}
+.proc-head { text-align: center; margin-bottom: 4rem; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em;}
 .proc-steps { display: flex; justify-content: space-around; position: relative; z-index: 2;}
 .step { text-align: center; }
 .step-num { 
@@ -264,8 +297,11 @@ html.lenis { height: auto; }
     position: relative;
 }
 .parceiros-title {
-    position: sticky; top: 10vh; text-align: center; font-size: 4vw; font-weight: 300;
-    font-family: 'Aktiv Grotesk', serif;
+    position: sticky; top: 10vh; text-align: center;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 100; /* Hairline */
+    font-family: 'Aktiv Grotesk', sans-serif;
+    letter-spacing: 0.05em;
     padding: 0 5vw;
 }
 .parceiros-spotlight {
@@ -293,7 +329,7 @@ html.lenis { height: auto; }
     align-items: center; justify-content: center;
     color: var(--noce-white); text-align: center;
 }
-.cta-headline { font-size: clamp(3rem, 6vw, 6rem); font-weight: 300; margin-bottom: 3rem;}
+.cta-headline { font-size: clamp(2rem, 5vw, 4rem); font-weight: 100; letter-spacing: 0.05em; margin-bottom: 3rem;}
 .cta-btns { display: flex; gap: 2rem; }
 .btn-outline {
     padding: 1.5rem 3rem; border: 1px solid var(--noce-white);
