@@ -76,12 +76,19 @@ function buildUI() {
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         ${sec.items.map((item, idx) => `
                             <div style="border:1px solid #ccc; padding:10px; display:flex; gap:10px; align-items:center;">
-                                <input type="text" value="${item.name}" onchange="updateItemName('${secName}', ${idx}, this.value)" placeholder="Nome">
-                                <input type="text" value="${item.image || ''}" onchange="updateItemImage('${secName}', ${idx}, this.value)" placeholder="/images/logo.png">
+                                <input type="text" value="${item.name}" onchange="updateItemName('${secName}', ${idx}, this.value)" placeholder="Nome" style="flex:1;">
+                                
+                                <div style="display:flex; flex-direction:column; gap:5px; flex:2;">
+                                    ${item.image ? `<img src="${item.image}" style="max-height:40px; object-fit:contain;">` : `<span style="font-size:10px;color:#999;">Sem logo/foto</span>`}
+                                    <div style="display:flex; gap:5px;">
+                                        <input type="file" id="fi-${secName}-${idx}" accept="image/*" style="display:none" onchange="uploadItemImage(event, '${secName}', ${idx})">
+                                        <button type="button" onclick="document.getElementById('fi-${secName}-${idx}').click()" style="padding:5px 10px; font-size:11px; cursor:pointer;">Fazer Upload</button>
+                                        <input type="text" value="${item.image || ''}" onchange="updateItemImage('${secName}', ${idx}, this.value)" placeholder="URL (opcional)" style="flex:1; font-size:11px;">
+                                    </div>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
-                    <p style="font-size:11px; color:#666; margin-top:5px;">Por enquanto os logos dos parceiros ou fotos de materiais devem ser enviados puxando a URL da imagem. Coloque '/images/...'.</p>
                 </div>
                 ` : ''}
             </div>
@@ -242,4 +249,34 @@ async function updateItemImage(section, index, value) {
     const list = siteData.sections[section] ? siteData.sections[section].items : siteData[section].items;
     list[index].image = value;
     await saveContent(false);
+}
+
+// Upload individual para list items (Logos Parceiros / Acabamentos)
+async function uploadItemImage(e, section, index) {
+    const file = e.target.files[0];
+    if(!file) return;
+
+    showToast("Fazendo upload da imagem...");
+    const formData = new FormData();
+    formData.append('photos', file); // A API espera array 'photos'
+
+    try {
+        const res = await fetch(`/api/upload/${section}`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        
+        if(data.success && data.files.length > 0) {
+            const list = siteData.sections[section] ? siteData.sections[section].items : siteData[section].items;
+            list[index].image = data.files[0];
+            await saveContent(false);
+            buildUI();
+            setupTabs();
+            document.querySelector(`.tab[data-target="${section}"]`).click();
+            showToast("Upload concluído!");
+        }
+    } catch(err) {
+        alert("Erro no upload do item");
+    }
 }
