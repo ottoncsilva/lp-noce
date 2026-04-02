@@ -1,0 +1,281 @@
+:root {
+    --noce-green: #233728;
+    --noce-black: #231d1b;
+    --noce-gray: #6b6b6b;
+    --noce-light: #e6e6e6;
+    --noce-white: #ffffff;
+    --overlay-dark: rgba(35,29,27,0.45);
+
+    /* Simulando Aktiv Grotesk, se houver o font-face local adicione aqui */
+    --font-display: 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+    font-family: 'Aktiv Grotesk';
+    src: local('Helvetica Neue'); /* Fallback luxuoso para Mac enquanto aguardamos as fontes originais */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--noce-white);
+    color: var(--noce-black);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Ocultar barra de rolagem */
+::-webkit-scrollbar { display: none; }
+body { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Lenis config */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* FIXED UI */
+.fixed-ui {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 999;
+}
+.logo {
+    font-family: 'Aktiv Grotesk', serif; /* Mantendo serif no mock original da foto NOCE PDF */
+    font-size: 32px;
+    color: var(--noce-white);
+    letter-spacing: 0.1em;
+    mix-blend-mode: difference;
+}
+
+.whatsapp-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background-color: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    /* GSAP js vai animar isso */
+}
+
+/* SECTIONS */
+.section {
+    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* HERO */
+.hero {
+    background: var(--noce-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.hero-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0; 
+}
+.hero-overlay {
+    position: absolute; inset: 0;
+    background-color: var(--overlay-dark);
+}
+.hero-content {
+    position: relative; z-index: 10;
+    color: var(--noce-white);
+    text-align: center;
+}
+.hero-logo {
+    font-family: 'Aktiv Grotesk', serif;
+    font-size: 20vw;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+.hero-tagline {
+    font-size: 14px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 1rem;
+}
+
+/* MANIFESTO */
+.manifesto {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    background: var(--noce-white);
+    color: var(--noce-black);
+}
+.manifesto-wrap { display: flex; gap: 1vw; overflow: hidden; margin-bottom: 3rem;}
+.manifesto-wrap h2 {
+    font-weight: 300; font-size: clamp(2rem, 5vw, 4rem);
+    white-space: nowrap;
+}
+.m-body {
+    max-width: 60vh; font-size: 16px; line-height: 1.8;
+    text-align: center;
+}
+
+/* AMBIENTES (Horizontal Scroll) */
+.ambiente-pin-wrap {
+    height: 100vh;
+    display: flex;
+    background: var(--noce-black);
+    color: var(--noce-white);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Entry Título */
+.ambiente-entry {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+.ambiente-entry h2 {
+    font-size: 18vw;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* O Track de rolagem lateral */
+.ambiente-track {
+    display: flex;
+    height: 100vh;
+    width: fit-content;
+    padding-left: 100vw; /* Inicia fora de tela pra entrada */
+}
+
+.gallery-item {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    flex-shrink: 0;
+}
+.gallery-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+.gallery-item .overlay-title {
+    position: absolute;
+    bottom: 3rem; left: 3rem;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.5);
+    padding: 1rem;
+}
+.gallery-sweep-line {
+    position: absolute; right: 0; top: 0; width: 1px; height: 100%; background: var(--noce-white);
+}
+
+/* ACABAMENTOS (Amostras) */
+.acabamentos-sec {
+    background: var(--noce-white);
+    padding: 10vh 0;
+}
+.section-entry-word {
+    text-align: center; font-size: 8vw;
+    font-weight: 300; color: var(--noce-black);
+    margin-bottom: 10vh;
+}
+.acabamentos-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 200vh; /* Espaço pro ScrollTrigger flutuar elementos */
+    background: transparent;
+    overflow: hidden;
+}
+.swatch {
+    position: absolute;
+    width: 200px; height: 300px;
+    background: #ccc;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+.swatch img { width: 100%; height: 100%; object-fit: cover; }
+.swatch .name {
+    position: absolute; bottom: 0; background: var(--noce-white);
+    width: 100%; padding: 1rem; font-size: 12px; opacity: 0; transition: 0.3s;
+}
+.swatch:hover .name { opacity: 1; }
+
+/* PROCESSO */
+.processo {
+    background: var(--noce-green);
+    color: var(--noce-white);
+    display: flex; flex-direction: column; justify-content: center;
+}
+.proc-head { text-align: center; margin-bottom: 4rem; font-size: 3rem; font-weight: 300;}
+.proc-steps { display: flex; justify-content: space-around; position: relative; z-index: 2;}
+.step { text-align: center; }
+.step-num { 
+    font-size: 2rem; width: 60px; height: 60px; 
+    border: 1px solid var(--noce-white); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem; background: var(--noce-green);
+}
+.proc-linha-progresso {
+    position: absolute; top: 50%; left: 10vw; width: 80vw; height: 1px;
+    background: rgba(255,255,255,0.2); z-index: 1;
+}
+
+/* PARCEIROS (Spotlight) */
+.parceiros-sec {
+    background: var(--noce-black);
+    color: var(--noce-white);
+    position: relative;
+}
+.parceiros-title {
+    position: sticky; top: 10vh; text-align: center; font-size: 4vw; font-weight: 300;
+}
+.parceiros-spotlight {
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 50vh; padding-bottom: 50vh;
+}
+.parc-logo {
+    width: 300px; height: auto; margin: 20vh 0;
+    opacity: 0.1; filter: grayscale(100%);
+    transition: all 0.5s;
+}
+.parc-logo.active {
+    opacity: 1; filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+/* INSTAGRAM */
+.instagram-strip { height: 50vh; background: var(--noce-white); overflow: hidden; display: flex; align-items: center;}
+.insta-horizontal { display: flex; gap: 1rem; }
+.insta-item { width: 300px; height: 300px; background: #eee; }
+
+/* CONTATO CTA */
+.contato {
+    background: var(--noce-green); display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: var(--noce-white); text-align: center;
+}
+.cta-headline { font-size: clamp(3rem, 6vw, 6rem); font-weight: 300; margin-bottom: 3rem;}
+.cta-btns { display: flex; gap: 2rem; }
+.btn-outline {
+    padding: 1.5rem 3rem; border: 1px solid var(--noce-white);
+    color: var(--noce-white); letter-spacing: 0.25em; text-transform: uppercase; font-size: 12px;
+}
+.minimal-footer { position: absolute; bottom: 2rem; font-size: 10px; color: var(--noce-gray); }

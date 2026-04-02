@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOCE mobili | Admin Portal</title>
+    <style>
+        :root {
+            --bg-color: #231d1b;
+            --text-color: #ffffff;
+            --accent-color: #233728;
+            --font: 'Aktiv Grotesk', -apple-system, sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font);
+            margin: 0; padding: 2rem;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 1rem; margin-bottom: 2rem;}
+        h1 { margin: 0; font-weight: 300; letter-spacing: 0.1em; }
+        
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 1rem;}
+        .tab { padding: 0.5rem 1rem; background: transparent; border: 1px solid #444; color: white; cursor: pointer; }
+        .tab.active { background: var(--accent-color); border-color: var(--accent-color); }
+        
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #aaa; font-size: 14px;}
+        input, textarea { width: 100%; padding: 0.8rem; background: #111; border: 1px solid #444; color: white; font-family: var(--font);}
+        textarea { min-height: 100px; resize: vertical; }
+        
+        .btn { padding: 0.8rem 2rem; background: var(--accent-color); color: white; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 0.1em; }
+        .btn:hover { background: #3a5841; }
+        
+        /* Drag and Drop zone */
+        .drop-zone { border: 2px dashed #444; padding: 3rem; text-align: center; margin-bottom: 1rem; transition: 0.3s; cursor: pointer;}
+        .drop-zone.dragover { border-color: var(--accent-color); background: rgba(35,55,40,0.2); }
+        
+        /* Image Preview Gallery */
+        .gallery-preview { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .img-card { position: relative; width: 150px; height: 150px; background: #333; }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-delete { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; padding: 5px; cursor: pointer; }
+
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #4CAF50; padding: 1rem 2rem; color: white; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>NOCE | ADMIN PORTAL</h1>
+        <button class="btn" onclick="saveContent()">Salvar Alterações Globais</button>
+    </div>
+
+    <div class="tabs" id="tabs-container">
+        <button class="tab active" data-target="geral">Geral & Manifesto</button>
+        <button class="tab" data-target="cozinha">Cozinha</button>
+        <button class="tab" data-target="living">Living</button>
+        <button class="tab" data-target="closet">Closet</button>
+        <button class="tab" data-target="banheiro">Banheiro</button>
+        <button class="tab" data-target="corporativo">Corporativo</button>
+        <button class="tab" data-target="acabamentos">Acabamentos</button>
+        <button class="tab" data-target="parceiros">Parceiros</button>
+    </div>
+
+    <div class="panels" id="panels-container">
+        <!-- Injetado via JS -->
+    </div>
+
+    <div class="toast" id="toast">✅ Salvo com sucesso!</div>
+
+    <script src="/admin/js/admin.js"></script>
+</body>
+</html>
