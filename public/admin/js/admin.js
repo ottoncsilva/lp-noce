@@ -41,7 +41,8 @@ function buildUI() {
         if(!sec) return;
 
         let hasImages = sec.images !== undefined;
-        let imagesArray = hasImages ? sec.images : (sec.items ? sec.items.map(i => i.image).filter(i=>i) : []);
+        let isList = sec.items !== undefined;
+        let imagesArray = hasImages ? sec.images : [];
 
         const html = `
             <div class="panel" id="panel-${secName}">
@@ -58,14 +59,31 @@ function buildUI() {
                     <input type="file" id="file-${secName}" multiple accept="image/*" style="display:none">
                     
                     <div class="gallery-preview" id="gal-${secName}">
-                        ${imagesArray.map(img => `
-                            <div class="img-card"><img src="${img}">
-                                <button class="btn-delete" onclick="deleteImage('${secName}', '${img}')">X</button>
+                        ${imagesArray.map((imgObj, idx) => `
+                            <div class="img-card" style="display:flex;flex-direction:column;gap:5px;">
+                                <img src="${imgObj.src || imgObj}" style="width:100%; height:150px; object-fit:cover;">
+                                <input type="text" placeholder="Legenda (opcional)" value="${imgObj.caption || ''}" onchange="updateCaption('${secName}', ${idx}, this.value)" style="padding:5px; font-size:12px;">
+                                <button class="btn-delete" onclick="deleteImage('${secName}', '${imgObj.src || imgObj}')">X</button>
                             </div>
                         `).join('')}
                     </div>
                 </div>
-                ` : `<p>Para editar itens desta seção específica, edite o JSON diretamente por enquanto na versão atual.</p>`}
+                ` : ''}
+
+                ${isList ? `
+                <div class="form-group">
+                    <label>Itens (${secName === 'parceiros' ? 'Parceiros' : 'Acabamentos'})</label>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        ${sec.items.map((item, idx) => `
+                            <div style="border:1px solid #ccc; padding:10px; display:flex; gap:10px; align-items:center;">
+                                <input type="text" value="${item.name}" onchange="updateItemName('${secName}', ${idx}, this.value)" placeholder="Nome">
+                                <input type="text" value="${item.image || ''}" onchange="updateItemImage('${secName}', ${idx}, this.value)" placeholder="/images/logo.png">
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p style="font-size:11px; color:#666; margin-top:5px;">Por enquanto os logos dos parceiros ou fotos de materiais devem ser enviados puxando a URL da imagem. Coloque '/images/...'.</p>
+                </div>
+                ` : ''}
             </div>
         `;
         container.insertAdjacentHTML('beforeend', html);
@@ -139,7 +157,9 @@ async function handleFiles(files, section) {
         if(data.success) {
             // Update siteData and save
             if(!siteData.sections[section].images) siteData.sections[section].images = [];
-            siteData.sections[section].images.push(...data.files);
+            // Converta os arquivos subidos para formato obj {src, caption}
+            const novasUrls = data.files.map(f => ({src: f, caption: ''}));
+            siteData.sections[section].images.push(...novasUrls);
             await saveContent(false);
             buildUI();
             setupTabs();
@@ -164,7 +184,7 @@ async function deleteImage(section, imgPath) {
         });
         
         // Update JSON
-        siteData.sections[section].images = siteData.sections[section].images.filter(i => i !== imgPath);
+        siteData.sections[section].images = siteData.sections[section].images.filter(i => (i.src || i) !== imgPath);
         await saveContent(false);
         buildUI();
         setupTabs();
@@ -204,4 +224,22 @@ function showToast(msg) {
     toast.textContent = msg;
     toast.style.display = 'block';
     setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+// Funções de Update Direto no Objeto
+async function updateCaption(section, index, value) {
+    siteData.sections[section].images[index].caption = value;
+    await saveContent(false);
+}
+
+async function updateItemName(section, index, value) {
+    const list = siteData.sections[section] ? siteData.sections[section].items : siteData[section].items;
+    list[index].name = value;
+    await saveContent(false);
+}
+
+async function updateItemImage(section, index, value) {
+    const list = siteData.sections[section] ? siteData.sections[section].items : siteData[section].items;
+    list[index].image = value;
+    await saveContent(false);
 }

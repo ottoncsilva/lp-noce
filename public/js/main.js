@@ -52,13 +52,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                     <div class="ambiente-track">
                         ${secData.images && secData.images.length > 0 
-                            ? secData.images.map(img => `
+                            ? secData.images.map(img => {
+                                const imgSrc = typeof img === 'string' ? img : img.src;
+                                const imgCap = typeof img === 'object' && img.caption ? img.caption : '';
+                                return `
                                 <div class="gallery-item">
-                                    <img src="${img}" alt="${secData.label}">
+                                    <img src="${imgSrc}" alt="${secData.label}">
+                                    ${imgCap ? `<div class="micro-caption">${imgCap}</div>` : ''}
                                     <div class="gallery-sweep-line"></div>
                                 </div>
-                            `).join('')
-                            : `<div class="gallery-item"><img src="/images/placeholder.jpg"><div class="gallery-sweep-line"></div></div>`
+                                `;
+                            }).join('')
+                            : `<div class="gallery-item"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--noce-white);">Fotos em Breve</div></div>`
                         }
                     </div>
                 </section>
@@ -130,43 +135,68 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 3. Ambientes (Horizontal Scroll & Pin)
         const ambientes = document.querySelectorAll('.ambiente-pin-wrap');
         
+        let mm = gsap.matchMedia();
+
         ambientes.forEach(section => {
             const track = section.querySelector('.ambiente-track');
             const entryWord = section.querySelector('.ambiente-word');
             const swipeIcon = section.querySelector('.swipe-icon-container');
             const images = section.querySelectorAll('.gallery-item img');
             
-            const wipeTl = gsap.timeline({
-                scrollTrigger: {
+            mm.add("(min-width: 769px)", () => {
+                const wipeTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top top",
+                        end: "+=300%", // Pin for 3 screen heights
+                        pin: true,
+                        scrub: 1,
+                        onEnter: () => swipeIcon.classList.add('visible'),
+                        onLeave: () => swipeIcon.classList.remove('visible'),
+                        onEnterBack: () => swipeIcon.classList.add('visible'),
+                        onLeaveBack: () => swipeIcon.classList.remove('visible')
+                    }
+                });
+
+                wipeTl.to(entryWord, { scale: 0.5, opacity: 0, duration: 1 })
+                      .to(track, {
+                          x: () => -(track.scrollWidth - window.innerWidth) + "px",
+                          ease: "none",
+                          duration: 4
+                      }, "<"); 
+
+                images.forEach((img, i) => {
+                    wipeTl.fromTo(img, 
+                        { scale: 1.3, transformOrigin: "left center" }, 
+                        { scale: 1, ease: "none", duration: 4 }, 
+                        "<0.2"
+                    );
+                });
+            });
+
+            mm.add("(max-width: 768px)", () => {
+                // No mobile, revelamos o ícone de swipe sem pin, via intersection ou trigger sútil
+                ScrollTrigger.create({
                     trigger: section,
-                    start: "top top",
-                    end: "+=300%", // Pin for 3 screen heights
-                    pin: true,
-                    scrub: 1,
+                    start: "top 50%",
+                    end: "bottom 50%",
                     onEnter: () => swipeIcon.classList.add('visible'),
                     onLeave: () => swipeIcon.classList.remove('visible'),
                     onEnterBack: () => swipeIcon.classList.add('visible'),
                     onLeaveBack: () => swipeIcon.classList.remove('visible')
-                }
-            });
+                });
 
-            // Zoom out word
-            wipeTl.to(entryWord, { scale: 0.5, opacity: 0, duration: 1 })
-                  // Slide in the track horizontally
-                  .to(track, {
-                      x: () => -(track.scrollWidth - window.innerWidth) + "px",
-                      ease: "none",
-                      duration: 4
-                  }, "<"); // começa quase ao mesmo tempo que o texto
-
-            // Dynamic parralax / zoom em cada imagem
-            images.forEach((img, i) => {
-                // Diminui o zoom lentamente enquanto o container rola (sensação de profundidade)
-                wipeTl.fromTo(img, 
-                    { scale: 1.3, transformOrigin: "left center" }, 
-                    { scale: 1, ease: "none", duration: 4 }, 
-                    "<0.2"
-                );
+                // Título some com o scroll
+                gsap.to(entryWord, {
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top center",
+                        end: "top top",
+                        scrub: true
+                    },
+                    scale: 0.8,
+                    opacity: 0.1
+                });
             });
         });
 

@@ -124,10 +124,12 @@ html.lenis { height: auto; }
 .manifesto-wrap h2 {
     font-weight: 300; font-size: clamp(2rem, 5vw, 4rem);
     white-space: nowrap;
+    padding: 0 5vw; /* Previne corte iPhone */
 }
 .m-body {
     max-width: 60vh; font-size: 16px; line-height: 1.8;
     text-align: center;
+    padding: 0 10vw; /* Impede grudar nas pontas */
 }
 
 /* AMBIENTES (Horizontal Scroll) */
@@ -181,6 +183,21 @@ html.lenis { height: auto; }
     text-transform: uppercase;
     background: rgba(0,0,0,0.5);
     padding: 1rem;
+}
+/* Estilo da Microlegenda (Glassmorphism) */
+.gallery-item .micro-caption {
+    position: absolute;
+    bottom: 3rem; right: 3rem;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: var(--noce-white);
+    max-width: 300px;
 }
 .gallery-sweep-line {
     position: absolute; right: 0; top: 0; width: 1px; height: 100%; background: var(--noce-white);
@@ -246,6 +263,8 @@ html.lenis { height: auto; }
 }
 .parceiros-title {
     position: sticky; top: 10vh; text-align: center; font-size: 4vw; font-weight: 300;
+    font-family: 'Aktiv Grotesk', serif;
+    padding: 0 5vw;
 }
 .parceiros-spotlight {
     display: flex; flex-direction: column; align-items: center;

@@ -45,6 +45,34 @@
 
     .section-entry-word {
         font-size: clamp(2rem, 10vw, 4rem);
+        padding: 0 5vw;
+    }
+
+    /* Native Horizontal Scrolling para mobile */
+    .ambiente-pin-wrap {
+        height: auto; /* Deixa esticar o quanto for */
+        min-height: 100vh;
+        align-items: center;
+    }
+    .ambiente-track {
+        height: 100vh;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-left: 0;
+        width: 100vw; /* Força caber dentro do viewport nativo */
+        display: flex;
+    }
+    .gallery-item {
+        scroll-snap-align: center;
+    }
+
+    /* Ajuste para as novas legendas não sumirem */
+    .gallery-item .micro-caption {
+        bottom: 2rem;
+        right: 1.5rem;
+        left: 1.5rem; /* Ocupa a base do celular centralizada */
+        width: auto;
+        text-align: center;
     }
 }
 
