@@ -172,17 +172,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Acabamentos
         if(data.acabamentos && data.acabamentos.items) {
             const wrapper = document.querySelector('.acabamentos-wrapper');
+            let _swatchZCounter = 10;
             data.acabamentos.items.forEach((item, i) => {
-                const left = 5 + Math.random() * 80;
-                const top = 10 + Math.random() * 150;
+                // Tighter horizontal range so swatches cluster more (less dead space)
+                const left = 8 + Math.random() * 62;
+                const top = 5 + Math.random() * 120;
                 const bg = item.image ? `url(${item.image})` : '#333';
-                
+
                 const swatchHTML = `
                     <div class="swatch" style="left: ${left}%; top: ${top}%; background: ${bg}; background-size: cover; background-position: center;" data-speed="${0.5 + Math.random() * 1.5}">
                         <div class="name">${escHtml(item.name)}</div>
                     </div>
                 `;
                 wrapper.insertAdjacentHTML('beforeend', swatchHTML);
+            });
+
+            // Click to bring swatch to front (fixes overlapping on desktop)
+            wrapper.addEventListener('click', e => {
+                const swatch = e.target.closest('.swatch');
+                if (!swatch) return;
+                wrapper.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+                swatch.style.zIndex = ++_swatchZCounter;
+                swatch.classList.add('active');
             });
         }
 
@@ -383,19 +394,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
-        // 4. Acabamentos (Zero Gravity Parallax)
-        const swatches = document.querySelectorAll('.swatch');
-        swatches.forEach(swatch => {
-            const speed = swatch.getAttribute('data-speed');
-            gsap.to(swatch, {
-                y: () => -100 * speed + "vh",
-                ease: "none",
-                scrollTrigger: {
-                    trigger: '.acabamentos-sec',
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: 0.5
-                }
+        // 4. Acabamentos (Zero Gravity Parallax — desktop only)
+        mm.add("(min-width: 769px)", () => {
+            const swatches = document.querySelectorAll('.swatch');
+            swatches.forEach(swatch => {
+                const speed = swatch.getAttribute('data-speed');
+                gsap.to(swatch, {
+                    y: () => -100 * speed + "vh",
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: '.acabamentos-sec',
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 0.5
+                    }
+                });
             });
         });
 
