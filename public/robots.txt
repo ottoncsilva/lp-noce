@@ -1,0 +1,23 @@
+# Noce Mobili - robots.txt
+User-agent: *
+Allow: /
+
+# AI Search Engines
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# Block admin from crawlers
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://nocemobili.com.br/sitemap.xml

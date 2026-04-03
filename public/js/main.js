@@ -17,10 +17,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await response.json();
         
         populateDOM(data);
-        setTimeout(initAnimations, 100); // Give DOM time to update
+        setTimeout(initAnimations, 100);
     } catch (err) {
         console.error("Error loading content:", err);
-        // Fallback to local data if running purely staticaly or error
     }
 
     function populateDOM(data) {
@@ -28,23 +27,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         const logoUrl = data.logo || '/images/placeholder.jpg';
         document.querySelectorAll('.main-logo-img').forEach(el => el.src = logoUrl);
 
-        // Hero
+        // Hero background (dynamic from admin)
         if(data.heroBg) {
             document.querySelector('.hero-bg').style.backgroundImage = `url('${data.heroBg}')`;
         }
-        document.querySelector('.hero-tagline').textContent = data.tagline;
+        document.querySelector('.hero-tagline').textContent = data.tagline || '';
 
-        // Manifesto
-        document.querySelector('.m-part1').textContent = data.manifesto.headline.split('não')[0] + ' não';
-        document.querySelector('.m-part2').textContent = data.manifesto.headline.split('não')[1].trim();
-        document.querySelector('.m-body').textContent = data.manifesto.body;
+        // Manifesto — SAFE split (no crash if "não" missing)
+        if(data.manifesto && data.manifesto.headline) {
+            const headline = data.manifesto.headline;
+            const parts = headline.split('não');
+            if(parts.length >= 2) {
+                document.querySelector('.m-part1').textContent = parts[0] + 'não';
+                document.querySelector('.m-part2').textContent = parts[1].trim();
+            } else {
+                document.querySelector('.m-part1').textContent = headline;
+                document.querySelector('.m-part2').textContent = '';
+            }
+        }
+        const mBody = document.querySelector('.m-body');
+        if(mBody && data.manifesto) mBody.textContent = data.manifesto.body || '';
 
         // Ambientes (Horizontal Scroll)
         const ambContainer = document.getElementById('ambientes-container');
         const sections = ['cozinha', 'living', 'closet', 'banheiro', 'corporativo'];
         
         sections.forEach(secName => {
-            const secData = data.sections[secName];
+            const secData = data.sections ? data.sections[secName] : null;
             if(!secData) return;
             
             const html = `
@@ -63,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 const imgCap = typeof img === 'object' && img.caption ? img.caption : '';
                                 return `
                                 <div class="gallery-item">
-                                    <img src="${imgSrc}" alt="${secData.label}">
+                                    <img src="${imgSrc}" alt="${secData.label} - Noce Mobili" loading="lazy" width="1920" height="1080">
                                     ${imgCap ? `<div class="micro-caption">${imgCap}</div>` : ''}
                                     <div class="gallery-sweep-line"></div>
                                 </div>
@@ -81,11 +90,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if(data.acabamentos && data.acabamentos.items) {
             const wrapper = document.querySelector('.acabamentos-wrapper');
             data.acabamentos.items.forEach((item, i) => {
-                // Random position logic for zero-gravity
-                const left = 5 + Math.random() * 80; // 5% to 85%
-                const top = 10 + Math.random() * 150; // 10% to 160% (overflow height)
-                
-                // fallback colors if no image
+                const left = 5 + Math.random() * 80;
+                const top = 10 + Math.random() * 150;
                 const bg = item.image ? `url(${item.image})` : '#333';
                 
                 const swatchHTML = `
@@ -102,18 +108,33 @@ document.addEventListener("DOMContentLoaded", async () => {
             const spot = document.querySelector('.parceiros-spotlight');
             data.parceiros.items.forEach(p => {
                 const img = p.image || '/images/placeholder.jpg';
-                spot.insertAdjacentHTML('beforeend', `<img src="${img}" class="parc-logo" alt="${p.name}">`);
+                spot.insertAdjacentHTML('beforeend', `<img src="${img}" class="parc-logo" alt="Parceiro ${p.name}" loading="lazy">`);
             });
         }
 
-        // CTA
-        document.querySelector('.cta-headline').textContent = data.cta.headline;
-        document.getElementById('btn-whats').href = `https://wa.me/${data.cta.whatsapp}`;
-        document.getElementById('btn-insta').href = `https://instagram.com/${data.cta.instagram}`;
+        // CTA — safe access
+        const cta = data.cta || {};
+        const ctaHeadline = document.querySelector('.cta-headline');
+        if(ctaHeadline) ctaHeadline.textContent = cta.headline || 'Vamos criar o seu ambiente?';
+        
+        const whatsNum = cta.whatsapp || '5511965665065';
+        
+        // Update ALL WhatsApp links (floating + footer button)
+        const whatsFloat = document.getElementById('whatsapp-float');
+        if(whatsFloat) whatsFloat.href = `https://wa.me/${whatsNum}`;
+        
+        const btnWhats = document.getElementById('btn-whats');
+        if(btnWhats) btnWhats.href = `https://wa.me/${whatsNum}`;
+        
+        // CTA intermediário
+        const ctaMidBtn = document.getElementById('btn-cta-mid');
+        if(ctaMidBtn) ctaMidBtn.href = `https://wa.me/${whatsNum}`;
+        
+        const btnInsta = document.getElementById('btn-insta');
+        if(btnInsta) btnInsta.href = `https://instagram.com/${cta.instagram || 'nocemobili'}`;
     }
 
     function initAnimations() {
-        // Register ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
 
         // 1. Hero Animation
@@ -138,6 +159,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                    .from('.m-part2', { x: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1")
                    .from('.m-body', { y: 30, opacity: 0, duration: 1 }, "-=0.5");
 
+        // 2.5. CTA Mid Animation
+        const ctaMid = document.querySelector('.cta-mid');
+        if(ctaMid) {
+            gsap.from('.cta-mid-inner', {
+                scrollTrigger: {
+                    trigger: '.cta-mid',
+                    start: "top 70%",
+                },
+                y: 30, opacity: 0, duration: 1, ease: "power3.out"
+            });
+        }
+
         // 3. Ambientes (Horizontal Scroll & Pin)
         const ambientes = document.querySelectorAll('.ambiente-pin-wrap');
         
@@ -154,7 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     scrollTrigger: {
                         trigger: section,
                         start: "top top",
-                        end: "+=300%", // Pin for 3 screen heights
+                        end: "+=300%",
                         pin: true,
                         scrub: 1,
                         onEnter: () => swipeIcon.classList.add('visible'),
@@ -181,7 +214,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
             mm.add("(max-width: 768px)", () => {
-                // No mobile, revelamos o ícone de swipe sem pin, via intersection ou trigger sútil
                 ScrollTrigger.create({
                     trigger: section,
                     start: "top 50%",
@@ -192,7 +224,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     onLeaveBack: () => swipeIcon.classList.remove('visible')
                 });
 
-                // Título some com o scroll
                 gsap.to(entryWord, {
                     scrollTrigger: {
                         trigger: section,
@@ -233,9 +264,41 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
-        // WhatsApp Floating Button loop
+        // 6. Processo Steps Animation (Sequential Reveal)
+        const steps = document.querySelectorAll('.step');
+        steps.forEach((step, i) => {
+            gsap.from(step, {
+                scrollTrigger: {
+                    trigger: '.proc-steps',
+                    start: "top 70%",
+                },
+                y: 40,
+                opacity: 0,
+                duration: 0.8,
+                delay: i * 0.2,
+                ease: "power3.out"
+            });
+        });
+
+        // 7. FAQ Animation
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach((item, i) => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: '.faq-list',
+                    start: "top 70%",
+                },
+                y: 30,
+                opacity: 0,
+                duration: 0.6,
+                delay: i * 0.15,
+                ease: "power3.out"
+            });
+        });
+
+        // 8. WhatsApp Floating Button — Pulse Ring
         gsap.to('.whatsapp-btn', {
-            y: -10, duration: 1.5, repeat: -1, yoyo: true, ease: "sine.inOut"
+            y: -6, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut"
         });
     }
 });

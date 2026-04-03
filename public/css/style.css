@@ -6,7 +6,7 @@
     --noce-white: #ffffff;
     --overlay-dark: rgba(35,29,27,0.45);
 
-    /* Simulando Aktiv Grotesk, se houver o font-face local adicione aqui */
+    /* Tipografia Oficial Noce Mobili — Aktiv Grotesk */
     --font-display: 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-body: 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -59,9 +59,11 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Ocultar barra de rolagem */
-::-webkit-scrollbar { display: none; }
-body { -ms-overflow-style: none; scrollbar-width: none; }
+/* Scrollbar mais discreta (mantém acessibilidade) */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(35,55,40,0.3); border-radius: 3px; }
+body { scrollbar-width: thin; scrollbar-color: rgba(35,55,40,0.3) transparent; }
 
 /* Lenis config */
 html.lenis { height: auto; }
@@ -77,10 +79,10 @@ html.lenis { height: auto; }
     z-index: 999;
 }
 .logo {
-    font-family: 'Aktiv Grotesk', serif; /* Mantendo serif no mock original da foto NOCE PDF */
-    font-size: 32px;
-    color: var(--noce-white);
-    letter-spacing: 0.1em;
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+    filter: invert(1);
     mix-blend-mode: difference;
 }
 
@@ -98,7 +100,23 @@ html.lenis { height: auto; }
     color: white;
     z-index: 999;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    /* GSAP js vai animar isso */
+    transition: box-shadow 0.3s;
+}
+.whatsapp-btn::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid #25D366;
+    opacity: 0;
+    animation: pulse-ring 2s ease-out infinite;
+}
+@keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+.whatsapp-btn:hover {
+    box-shadow: 0 6px 25px rgba(37,211,102,0.4);
 }
 
 /* SECTIONS */
@@ -335,4 +353,148 @@ html.lenis { height: auto; }
     padding: 1.5rem 3rem; border: 1px solid var(--noce-white);
     color: var(--noce-white); letter-spacing: 0.25em; text-transform: uppercase; font-size: 12px;
 }
-.minimal-footer { position: absolute; bottom: 2rem; font-size: 10px; color: var(--noce-gray); }
+.minimal-footer { position: absolute; bottom: 2rem; font-size: 10px; color: rgba(255,255,255,0.4); }
+
+/* === ACCESSIBILITY: Skip Link === */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--noce-green);
+    color: var(--noce-white);
+    z-index: 10000;
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    transition: top 0.2s;
+}
+.skip-link:focus { top: 0; }
+
+/* === CTA INTERMEDIÁRIO === */
+.cta-mid {
+    min-height: auto;
+    padding: 6rem 2rem;
+    background: var(--noce-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cta-mid-inner {
+    text-align: center;
+}
+.cta-mid-text {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 300;
+    color: var(--noce-gray);
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+}
+.cta-mid-btn {
+    display: inline-block;
+    padding: 1.2rem 3rem;
+    border: 1px solid var(--noce-green) !important;
+    color: var(--noce-green) !important;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+.cta-mid-btn:hover {
+    background: var(--noce-green);
+    color: var(--noce-white) !important;
+}
+
+/* === FAQ SECTION === */
+.faq-sec {
+    min-height: auto;
+    padding: 8rem 2rem;
+    background: var(--noce-white);
+}
+.faq-title {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 100;
+    letter-spacing: 0.05em;
+    color: var(--noce-black);
+    margin-bottom: 4rem;
+}
+.faq-list {
+    max-width: 700px;
+    margin: 0 auto;
+}
+.faq-item {
+    border-bottom: 1px solid var(--noce-light);
+    padding: 1.5rem 0;
+}
+.faq-item summary {
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.02em;
+    color: var(--noce-black);
+}
+.faq-item summary::after {
+    content: '+';
+    font-weight: 100;
+    font-size: 1.5rem;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+.faq-item[open] summary::after {
+    content: '−';
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item p {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--noce-gray);
+    font-weight: 300;
+}
+
+/* === SWIPE ICON === */
+.swipe-icon-container {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+}
+.swipe-icon-container.visible { opacity: 1; }
+.swipe-text {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+}
+.swipe-hand {
+    fill: rgba(255,255,255,0.4);
+    width: 24px;
+    height: 24px;
+    animation: swipe-anim 1.5s ease-in-out infinite;
+}
+@keyframes swipe-anim {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-10px); }
+}
+
+/* === PROCESSO — TYPOGRAPHY FIX === */
+.proc-title {
+    font-weight: 100;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    letter-spacing: 0.05em;
+}

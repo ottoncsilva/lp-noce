@@ -4,11 +4,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     await fetchContent();
     buildUI();
     setupNav();
+    setupMobileMenu();
 });
 
 async function fetchContent() {
-    const res = await fetch('/api/content');
-    siteData = await res.json();
+    try {
+        const res = await fetch('/api/content');
+        if (!res.ok) throw new Error('Network error');
+        siteData = await res.json();
+    } catch(err) {
+        showToast("Erro ao carregar dados", "error");
+    }
 }
 
 function buildUI() {
@@ -20,7 +26,7 @@ function buildUI() {
         <div class="panel active" id="panel-geral">
             <div class="card">
                 <h3>Logotipo Oficial</h3>
-                <div style="display:flex; gap:15px; align-items:center;">
+                <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
                     ${siteData.logo ? `<img src="${siteData.logo}" style="height:50px; background:#233728; padding:8px; border-radius:4px;">` : '<span style="color:#999; font-size:0.85rem;">Nenhum logo enviado</span>'}
                     <input type="file" id="file-logo" accept="image/*" style="display:none" onchange="uploadLogoGlobal(event)">
                     <button class="btn btn-sm" onclick="document.getElementById('file-logo').click()">Upload Logo</button>
@@ -49,17 +55,17 @@ function buildUI() {
     // === AMBIENTES PANELS ===
     const ambSections = ['cozinha', 'living', 'closet', 'banheiro', 'corporativo'];
     ambSections.forEach(secName => {
-        const sec = siteData.sections[secName];
+        const sec = siteData.sections ? siteData.sections[secName] : null;
         if(!sec) return;
         buildAmbientePanel(container, secName, sec);
     });
 
     // === ACABAMENTOS PANEL ===
-    const acab = siteData.acabamentos || siteData.sections?.acabamentos;
+    const acab = siteData.acabamentos || (siteData.sections ? siteData.sections.acabamentos : null);
     if(acab) buildListPanel(container, 'acabamentos', acab);
 
     // === PARCEIROS PANEL ===
-    const parc = siteData.parceiros || siteData.sections?.parceiros;
+    const parc = siteData.parceiros || (siteData.sections ? siteData.sections.parceiros : null);
     if(parc) buildListPanel(container, 'parceiros', parc);
 
     // === CONFIG PANEL ===
@@ -81,7 +87,10 @@ function buildAmbientePanel(container, secName, sec) {
             <div class="card">
                 <h3>Galeria de Imagens</h3>
                 <div class="drop-zone" id="dz-${secName}">
-                    Arraste fotos aqui ou clique para selecionar
+                    📁 Arraste fotos aqui ou clique para selecionar
+                </div>
+                <div class="upload-progress" id="prog-${secName}">
+                    <div class="upload-progress-bar" id="progbar-${secName}"></div>
                 </div>
                 <input type="file" id="file-${secName}" multiple accept="image/*" style="display:none">
                 <div class="gallery-preview" id="gal-${secName}">
@@ -90,8 +99,8 @@ function buildAmbientePanel(container, secName, sec) {
                         const cap = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
                         return `
                         <div class="img-card">
-                            <img src="${src}">
-                            <button class="btn-delete-img" onclick="deleteImage('${secName}', '${src}')">✕</button>
+                            <img src="${src}" alt="Imagem ${idx+1}">
+                            <button class="btn-delete-img" onclick="deleteImage('${secName}', '${src}')" title="Apagar">✕</button>
                             <input type="text" placeholder="Legenda..." value="${cap}" onchange="updateCaption('${secName}', ${idx}, this.value)">
                         </div>`;
                     }).join('')}
@@ -122,7 +131,7 @@ function buildListPanel(container, secName, sec) {
                     ${(sec.items || []).map((item, idx) => `
                         <div class="item-row">
                             <input type="text" value="${item.name}" onchange="updateItemName('${secName}', ${idx}, this.value)" placeholder="Nome" style="flex:1;">
-                            ${item.image ? `<img src="${item.image}">` : ''}
+                            ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
                             <input type="file" id="fi-${secName}-${idx}" accept="image/*" style="display:none" onchange="uploadItemImage(event, '${secName}', ${idx})">
                             <button class="btn btn-sm btn-outline-dark" onclick="document.getElementById('fi-${secName}-${idx}').click()">Upload</button>
                             <button class="btn btn-sm btn-danger" onclick="deleteItem('${secName}', ${idx})">✕</button>
@@ -164,7 +173,7 @@ function buildConfigPanel(container) {
 
             <div class="card">
                 <h3>Imagem de Fundo do Hero</h3>
-                <div style="display:flex; gap:15px; align-items:center;">
+                <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
                     ${siteData.heroBg ? `<img src="${siteData.heroBg}" style="height:60px; border-radius:4px;">` : '<span style="color:#999; font-size:0.85rem;">Placeholder padrão</span>'}
                     <input type="file" id="file-hero-bg" accept="image/*" style="display:none" onchange="uploadHeroBg(event)">
                     <button class="btn btn-sm" onclick="document.getElementById('file-hero-bg').click()">Upload Novo Fundo</button>
@@ -187,10 +196,31 @@ function setupNav() {
             const panel = document.getElementById('panel-' + target);
             if(panel) panel.classList.add('active');
 
-            // Update topbar title
             document.getElementById('topbar-title').textContent = item.textContent.trim();
+
+            // Close mobile menu
+            closeMobileMenu();
         });
     });
+}
+
+// === MOBILE MENU ===
+function setupMobileMenu() {
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay-bg');
+
+    hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', closeMobileMenu);
+}
+
+function closeMobileMenu() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay-bg').classList.remove('active');
 }
 
 // === DROP ZONE ===
@@ -224,23 +254,54 @@ async function handleFiles(files, section) {
     const formData = new FormData();
     for(let i = 0; i < files.length; i++) formData.append('photos', files[i]);
 
-    document.getElementById(`dz-${section}`).textContent = "Enviando e otimizando imagens...";
+    const dz = document.getElementById(`dz-${section}`);
+    const prog = document.getElementById(`prog-${section}`);
+    const progBar = document.getElementById(`progbar-${section}`);
+    
+    dz.textContent = `⏳ Enviando ${files.length} imagem(ns)...`;
+    dz.classList.add('uploading');
+    
+    // Show progress bar
+    if(prog) {
+        prog.classList.add('active');
+        progBar.style.width = '10%';
+    }
 
     try {
+        // Simulate progress
+        if(progBar) {
+            setTimeout(() => progBar.style.width = '40%', 300);
+            setTimeout(() => progBar.style.width = '70%', 800);
+        }
+        
         const res = await fetch(`/api/upload/${section}`, { method: 'POST', body: formData });
         const data = await res.json();
+        
+        if(progBar) progBar.style.width = '100%';
+        
         if(data.success) {
             if(!siteData.sections[section].images) siteData.sections[section].images = [];
             const novas = data.files.map(f => ({src: f, caption: ''}));
             siteData.sections[section].images.push(...novas);
             await saveContent(false);
-            rebuildCurrentPanel(section);
-            showToast("Upload concluído!");
+            
+            setTimeout(() => {
+                rebuildCurrentPanel(section);
+                showToast(`${files.length} imagem(ns) enviada(s)!`, "success");
+            }, 300);
         }
-    } catch(err) { alert("Erro no upload"); }
+    } catch(err) { 
+        showToast("Erro no upload", "error");
+    }
     finally { 
-        const dz = document.getElementById(`dz-${section}`);
-        if(dz) dz.textContent = "Arraste fotos aqui ou clique para selecionar";
+        dz.textContent = "📁 Arraste fotos aqui ou clique para selecionar";
+        dz.classList.remove('uploading');
+        if(prog) {
+            setTimeout(() => {
+                prog.classList.remove('active');
+                progBar.style.width = '0%';
+            }, 500);
+        }
     }
 }
 
@@ -256,7 +317,8 @@ async function deleteImage(section, imgPath) {
         siteData.sections[section].images = siteData.sections[section].images.filter(i => (i.src || i) !== imgPath);
         await saveContent(false);
         rebuildCurrentPanel(section);
-    } catch(err) { alert("Erro ao apagar"); }
+        showToast("Imagem removida", "info");
+    } catch(err) { showToast("Erro ao apagar imagem", "error"); }
 }
 
 async function updateCaption(section, index, value) {
@@ -279,7 +341,7 @@ async function updateItemImage(section, index, value) {
 async function uploadItemImage(e, section, index) {
     const file = e.target.files[0];
     if(!file) return;
-    showToast("Fazendo upload...");
+    showToast("Enviando imagem...", "info");
     const formData = new FormData();
     formData.append('photos', file);
     try {
@@ -290,9 +352,9 @@ async function uploadItemImage(e, section, index) {
             list[index].image = data.files[0];
             await saveContent(false);
             rebuildCurrentPanel(section);
-            showToast("Upload concluído!");
+            showToast("Imagem atualizada!", "success");
         }
-    } catch(err) { alert("Erro no upload do item"); }
+    } catch(err) { showToast("Erro no upload", "error"); }
 }
 
 async function addNewItem(section) {
@@ -308,6 +370,7 @@ async function deleteItem(section, index) {
     list.splice(index, 1);
     await saveContent(false);
     rebuildCurrentPanel(section);
+    showToast("Item removido", "info");
 }
 
 function getItemList(section) {
@@ -324,7 +387,7 @@ function getItemList(section) {
 async function uploadLogoGlobal(e) {
     const file = e.target.files[0];
     if(!file) return;
-    showToast("Subindo logotipo...");
+    showToast("Subindo logotipo...", "info");
     const formData = new FormData();
     formData.append('photos', file);
     try {
@@ -334,22 +397,23 @@ async function uploadLogoGlobal(e) {
             siteData.logo = data.files[0];
             await saveContent(false);
             rebuildCurrentPanel('geral');
-            showToast("Logotipo atualizado!");
+            showToast("Logotipo atualizado!", "success");
         }
-    } catch(err) { alert("Erro no upload"); }
+    } catch(err) { showToast("Erro no upload", "error"); }
 }
 
 async function removeLogoGlobal() {
     siteData.logo = "";
     await saveContent(false);
     rebuildCurrentPanel('geral');
+    showToast("Logo removido", "info");
 }
 
 // === HERO BG ===
 async function uploadHeroBg(e) {
     const file = e.target.files[0];
     if(!file) return;
-    showToast("Subindo imagem de fundo...");
+    showToast("Subindo imagem de fundo...", "info");
     const formData = new FormData();
     formData.append('photos', file);
     try {
@@ -359,13 +423,16 @@ async function uploadHeroBg(e) {
             siteData.heroBg = data.files[0];
             await saveContent(false);
             rebuildCurrentPanel('config');
-            showToast("Imagem de fundo atualizada!");
+            showToast("Imagem de fundo atualizada!", "success");
         }
-    } catch(err) { alert("Erro no upload"); }
+    } catch(err) { showToast("Erro no upload", "error"); }
 }
 
 // === SAVE ===
 async function saveContent(showMsg = true) {
+    // Update save status
+    updateSaveStatus('saving');
+    
     // Collect editable fields
     const tagline = document.getElementById('inp-tagline');
     if(tagline) siteData.tagline = tagline.value;
@@ -394,13 +461,18 @@ async function saveContent(showMsg = true) {
     if(ctaH) { if(!siteData.cta) siteData.cta = {}; siteData.cta.headline = ctaH.value; }
 
     try {
-        await fetch('/api/content', {
+        const res = await fetch('/api/content', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(siteData)
         });
-        if(showMsg) showToast("Salvo com sucesso!");
-    } catch(err) { alert("Erro ao salvar"); }
+        if(!res.ok) throw new Error('Save failed');
+        updateSaveStatus('saved');
+        if(showMsg) showToast("Salvo com sucesso!", "success");
+    } catch(err) { 
+        updateSaveStatus('error');
+        showToast("Erro ao salvar", "error");
+    }
 }
 
 // === HELPERS ===
@@ -411,9 +483,30 @@ function rebuildCurrentPanel(section) {
     if(navItem) navItem.click();
 }
 
-function showToast(msg) {
+function showToast(msg, type = 'info') {
     const t = document.getElementById('toast');
-    t.textContent = '✅ ' + msg;
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    t.textContent = `${icons[type] || '✅'} ${msg}`;
+    t.className = `toast ${type}`;
     t.style.display = 'block';
     setTimeout(() => t.style.display = 'none', 3000);
+}
+
+function updateSaveStatus(state) {
+    const el = document.getElementById('save-status');
+    if(!el) return;
+    const dot = el.querySelector('.dot');
+    const text = el.querySelector('span:last-child');
+    
+    if(state === 'saving') {
+        dot.className = 'dot saving';
+        text.textContent = 'Salvando...';
+    } else if(state === 'saved') {
+        dot.className = 'dot saved';
+        text.textContent = 'Salvo';
+    } else {
+        dot.className = 'dot';
+        dot.style.background = '#c0392b';
+        text.textContent = 'Erro';
+    }
 }
