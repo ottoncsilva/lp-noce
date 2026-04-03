@@ -390,10 +390,10 @@ html.lenis { height: auto; }
 }
 .parceiros-spotlight {
     display: flex; flex-direction: column; align-items: center;
-    padding-top: 20vh; padding-bottom: 20vh;
+    padding-top: 10vh; padding-bottom: 10vh;
 }
 .parc-logo {
-    width: 200px; max-width: 40vw; height: auto; margin: 6vh 0;
+    width: 200px; max-width: 40vw; height: auto; margin: 3vh 0;
     opacity: 0.2; filter: grayscale(100%);
     transition: all 0.5s;
 }
