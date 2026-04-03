@@ -116,13 +116,12 @@ function renderSidebar() {
 
             <div class="nav-section-title" style="margin-top:0.5rem;">Ambientes</div>
             <div class="nav-group open" id="nav-group-ambientes">
-                <button class="nav-group-toggle" onclick="toggleNavGroup('nav-group-ambientes')">
-                    <span class="toggle-left">${iconRooms()} Ambientes</span>
-                    <span style="display:flex;align-items:center;gap:6px;">
-                        <button class="btn-add-cat" onclick="openNewCategoryModal(event)" title="Nova categoria">+</button>
-                        ${iconChevron()}
-                    </span>
-                </button>
+                <div class="nav-group-header">
+                    <button class="nav-group-toggle" onclick="toggleNavGroup('nav-group-ambientes')">
+                        ${iconRooms()} Ambientes ${iconChevron()}
+                    </button>
+                    <button class="btn-add-cat" onclick="openNewCategoryModal(event)" title="Nova categoria">+</button>
+                </div>
                 <div class="nav-submenu" id="submenu-ambientes">
                     ${order.map(secId => {
                         if (!siteData.sections || !siteData.sections[secId]) return '';
@@ -142,7 +141,6 @@ function renderSidebar() {
         `;
     } catch(err) {
         console.error('renderSidebar error:', err);
-        // Fallback mínimo
         const nav = document.getElementById('sidebar-nav');
         if (nav) nav.innerHTML = `
             <div class="nav-section-title">Navegação</div>
@@ -150,6 +148,7 @@ function renderSidebar() {
         `;
     }
 }
+
 
 function toggleNavGroup(id) {
     document.getElementById(id).classList.toggle('open');
