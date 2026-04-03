@@ -171,17 +171,33 @@ html.lenis { height: auto; }
     justify-content: center; align-items: center;
     background: var(--noce-white);
     color: var(--noce-black);
+    padding: 10vh 5vw; /* Adds breathable space around */
 }
-.manifesto-wrap { display: flex; gap: 1vw; overflow: hidden; margin-bottom: 3rem;}
+.manifesto-wrap { 
+    display: flex; 
+    gap: 1.5vw; 
+    overflow: hidden; 
+    margin-bottom: 4rem; 
+    align-items: center; 
+    justify-content: center;
+}
 .manifesto-wrap h2 {
-    font-weight: 300; font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 300; 
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
     white-space: nowrap;
-    padding: 0 5vw; /* Previne corte iPhone */
+    padding: 0 2vw;
+}
+.manifesto-body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 .m-body {
-    max-width: 60vh; font-size: 16px; line-height: 1.8;
+    max-width: 800px; 
+    font-size: clamp(1rem, 1.5vw, 1.5rem); 
+    line-height: 1.6;
     text-align: center;
-    padding: 0 10vw; /* Impede grudar nas pontas */
+    padding: 0 5vw;
 }
 
 /* AMBIENTES (Horizontal Scroll) */
