@@ -548,33 +548,38 @@
         </div>
     </div>
 
-    <!-- Modal: Crop Visual Interativo -->
+    <!-- Modal: Crop Visual — Editor de Imagem -->
     <div class="modal-overlay" id="crop-modal">
-        <div class="modal" style="width:600px; max-width:95%;">
-            <h3>Foco e Enquadramento da Imagem</h3>
-            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem;">Arraste a própria imagem dentro das áreas tracejadas para definir qual parte deve ficar visível.</p>
+        <div class="modal" style="width:720px; max-width:96%; padding:1.5rem;">
+            <h3 style="margin-bottom:0.25rem;">Enquadramento da Imagem</h3>
+            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Arraste o quadro tracejado sobre a foto para definir o que será visível em cada formato.</p>
             
-            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:1.5rem;">
-                <!-- Desktop -->
-                <div style="flex:1; min-width:250px;">
-                    <h4 style="font-size:0.9rem; margin-bottom:5px;">Desktop e iPad (Paisagem)</h4>
-                    <p style="font-size:0.75rem; color:#888; margin-bottom:10px;">Arraste para ajustar</p>
-                    <div class="crop-preview-container" id="cp-container-desk" style="width:100%; aspect-ratio:16/9; border:2px dashed var(--noce-green); overflow:hidden; cursor:grab; position:relative; background:#eee;">
-                        <img id="cp-img-desk" src="" style="width:100%; height:100%; object-fit:cover; object-position:50% 50%; pointer-events:none;">
-                    </div>
-                </div>
+            <!-- Tabs Desktop / Mobile -->
+            <div style="display:flex; gap:8px; margin-bottom:1rem;">
+                <button id="crop-tab-desk" onclick="switchCropTab('desk')"
+                    style="padding:6px 14px; border-radius:20px; border:1px solid var(--noce-green); background:var(--noce-green); color:#fff; font-size:0.8rem; cursor:pointer;">
+                    🖥 Desktop / iPad
+                </button>
+                <button id="crop-tab-mob" onclick="switchCropTab('mob')"
+                    style="padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; font-size:0.8rem; cursor:pointer;">
+                    📱 Mobile
+                </button>
+            </div>
 
-                <!-- Mobile -->
-                <div style="width:180px;">
-                    <h4 style="font-size:0.9rem; margin-bottom:5px;">Mobile (Retrato)</h4>
-                    <p style="font-size:0.75rem; color:#888; margin-bottom:10px;">Arraste para ajustar</p>
-                    <div class="crop-preview-container" id="cp-container-mob" style="width:100%; aspect-ratio:9/16; border:2px dashed var(--noce-green); overflow:hidden; cursor:grab; position:relative; background:#eee; margin:0 auto;">
-                        <img id="cp-img-mob" src="" style="width:100%; height:100%; object-fit:cover; object-position:50% 50%; pointer-events:none;">
+            <!-- Canvas area: imagem + frame arrastável -->
+            <div id="crop-canvas-wrap" style="position:relative; width:100%; background:#111; border-radius:8px; overflow:hidden; user-select:none; touch-action:none;">
+                <!-- Imagem completa -->
+                <img id="cp-full-img" src="" alt="" style="width:100%; height:auto; display:block; pointer-events:none;">
+                <!-- Frame de corte arrastável -->
+                <div id="crop-frame"
+                    style="position:absolute; border:3px dashed rgba(255,255,255,0.9); box-shadow:0 0 0 9999px rgba(0,0,0,0.45); cursor:move; box-sizing:border-box; touch-action:none;">
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                        <span style="background:rgba(0,0,0,0.4);color:#fff;font-size:0.7rem;padding:2px 6px;border-radius:4px;" id="crop-label-hint"></span>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-actions">
+            <div class="modal-actions" style="margin-top:1rem;">
                 <button class="btn btn-outline" onclick="closeCropModal()">Cancelar</button>
                 <button class="btn" onclick="confirmCrop()">Salvar Foco</button>
             </div>

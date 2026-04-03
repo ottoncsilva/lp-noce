@@ -230,19 +230,49 @@ html.lenis { height: auto; }
     text-transform: uppercase;
 }
 
-/* O Track de rolagem lateral */
+/* O Track de rolagem lateral — Desktop: overflow scroll / Mobile: swipe nativo */
 .ambiente-track {
     display: flex;
     height: 100vh;
-    width: fit-content;
-    padding-left: 100vw; /* Inicia fora de tela pra entrada */
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
 }
+.ambiente-track::-webkit-scrollbar { display: none; }
+
+/* Setas de Navegação (apenas desktop) */
+.amb-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--noce-white);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.3s;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+}
+.amb-arrow:hover { background: rgba(255,255,255,0.3); }
+.amb-arrow-prev { left: 2rem; }
+.amb-arrow-next { right: 2rem; }
 
 .gallery-item {
     width: 100vw;
     height: 100vh;
+    min-width: 100vw;
     position: relative;
     flex-shrink: 0;
+    scroll-snap-align: start;
 }
 .gallery-item img {
     width: 100%; height: 100%;

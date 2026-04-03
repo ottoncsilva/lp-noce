@@ -932,66 +932,169 @@ async function removeHeroBg() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CROP MODAL VISUAL (DRAGGABLE)
+// CROP MODAL — FRAME ARRASTÁVEL (Editor de Imagem)
 // ─────────────────────────────────────────────────────────────
 
 let cropState = { secId: '', idx: -1, desk: '50% 50%', mob: '50% 50%' };
+let _currentCropTab = 'desk'; // 'desk' ou 'mob'
 
-// Convert basic words to percent if legacy
-function posToPercent(posStr) {
-    if (!posStr) return { x: 50, y: 50 };
-    let x = 50, y = 50;
-    if (posStr.includes('left')) x = 0;
-    if (posStr.includes('right')) x = 100;
-    if (posStr.includes('top')) y = 0;
-    if (posStr.includes('bottom')) y = 100;
+// Aspect ratios do frame para cada formato
+const CROP_RATIOS = { desk: 16/9, mob: 9/16 };
+
+function switchCropTab(tab) {
+    // Salva posição atual antes de trocar
+    _currentCropTab = tab;
+
+    const btnDesk = document.getElementById('crop-tab-desk');
+    const btnMob  = document.getElementById('crop-tab-mob');
     
-    const parts = posStr.split(' ');
-    if (parts.length === 2) {
-        if (!isNaN(parseFloat(parts[0]))) x = parseFloat(parts[0]);
-        if (!isNaN(parseFloat(parts[1]))) y = parseFloat(parts[1]);
+    if (tab === 'desk') {
+        btnDesk.style.background = 'var(--noce-green)';
+        btnDesk.style.color = '#fff';
+        btnDesk.style.borderColor = 'var(--noce-green)';
+        btnMob.style.background = 'transparent';
+        btnMob.style.color = '';
+        btnMob.style.borderColor = 'var(--border)';
+        document.getElementById('crop-label-hint').textContent = '16:9 Desktop';
+    } else {
+        btnMob.style.background = 'var(--noce-green)';
+        btnMob.style.color = '#fff';
+        btnMob.style.borderColor = 'var(--noce-green)';
+        btnDesk.style.background = 'transparent';
+        btnDesk.style.color = '';
+        btnDesk.style.borderColor = 'var(--border)';
+        document.getElementById('crop-label-hint').textContent = '9:16 Mobile';
     }
-    return { x, y };
+
+    // Reposiciona o frame para a posição salva do tab ativo
+    const pos = tab === 'desk' ? cropState.desk : cropState.mob;
+    positionFrameFromPercent(pos, tab);
+}
+
+function positionFrameFromPercent(posStr, tab) {
+    const frame = document.getElementById('crop-frame');
+    const canvas = document.getElementById('crop-canvas-wrap');
+    const img = document.getElementById('cp-full-img');
+    if (!frame || !canvas || !img.naturalWidth) return;
+
+    const canvasW = canvas.clientWidth;
+    const canvasH = canvas.clientHeight || img.clientHeight;
+    const ratio   = CROP_RATIOS[tab];
+
+    // Frame dimensions
+    let fw, fh;
+    if (ratio >= 1) {
+        // Paisagem: largura máxima 80% do canvas
+        fw = canvasW * 0.8;
+        fh = fw / ratio;
+        if (fh > canvasH * 0.85) { fh = canvasH * 0.85; fw = fh * ratio; }
+    } else {
+        // Retrato: altura máxima 85% do canvas
+        fh = canvasH * 0.85;
+        fw = fh * ratio;
+        if (fw > canvasW * 0.7) { fw = canvasW * 0.7; fh = fw / ratio; }
+    }
+
+    frame.style.width  = fw + 'px';
+    frame.style.height = fh + 'px';
+
+    // parsear posStr: "50% 50%" ou "top left"
+    let px = 50, py = 50;
+    if (posStr) {
+        if (posStr.includes('left')) px = 0;
+        else if (posStr.includes('right')) px = 100;
+        const pp = posStr.match(/([\d.]+)%\s+([\d.]+)%/);
+        if (pp) { px = parseFloat(pp[1]); py = parseFloat(pp[2]); }
+        if (posStr.includes('top')) py = 0;
+        else if (posStr.includes('bottom')) py = 100;
+    }
+
+    // Converter % da imagem para px no canvas
+    const maxX = canvasW - fw;
+    const maxY = canvasH - fh;
+    frame.style.left = Math.max(0, Math.min(maxX, (px / 100) * maxX)) + 'px';
+    frame.style.top  = Math.max(0, Math.min(maxY, (py / 100) * maxY)) + 'px';
+}
+
+function frameToPercent() {
+    const frame  = document.getElementById('crop-frame');
+    const canvas = document.getElementById('crop-canvas-wrap');
+    const fw = frame.offsetWidth, fh = frame.offsetHeight;
+    const maxX = canvas.clientWidth  - fw;
+    const maxY = canvas.clientHeight - fh;
+    const pctX = maxX > 0 ? (parseFloat(frame.style.left) / maxX) * 100 : 50;
+    const pctY = maxY > 0 ? (parseFloat(frame.style.top)  / maxY) * 100 : 50;
+    return `${pctX.toFixed(1)}% ${pctY.toFixed(1)}%`;
 }
 
 let _dragListenersSetup = false;
 
 function openCropModal(secId, idx, deskPos, mobPos) {
-    if(!deskPos || deskPos === 'center center') deskPos = '50% 50%';
-    if(!mobPos || mobPos === 'center center') mobPos = '50% 50%';
-    
+    if (!deskPos || deskPos === 'center center') deskPos = '50% 50%';
+    if (!mobPos  || mobPos === 'center center')  mobPos  = '50% 50%';
+
     cropState = { secId, idx, desk: deskPos, mob: mobPos };
+    _currentCropTab = 'desk';
 
-    // Get image src
-    let src = '';
+    // Carregar imagem
     const item = siteData.sections[secId].images[idx];
-    if (typeof item === 'string') src = item;
-    else src = item.src;
-
-    // Desk Setup
-    const deskImg = document.getElementById('cp-img-desk');
-    deskImg.src = src;
-    deskImg.style.objectPosition = deskPos;
-    deskImg.dataset.x = posToPercent(deskPos).x;
-    deskImg.dataset.y = posToPercent(deskPos).y;
-
-    // Mob Setup
-    const mobImg = document.getElementById('cp-img-mob');
-    mobImg.src = src;
-    mobImg.style.objectPosition = mobPos;
-    mobImg.dataset.x = posToPercent(mobPos).x;
-    mobImg.dataset.y = posToPercent(mobPos).y;
+    const src  = typeof item === 'string' ? item : item.src;
+    const fullImg = document.getElementById('cp-full-img');
+    fullImg.src = src;
 
     document.getElementById('crop-modal').classList.add('open');
-    
-    // Setup drag apenas uma vez (após o modal estar visível e ter dimensões)
+    switchCropTab('desk');
+
+    // Setup drag do frame (uma só vez)
     if (!_dragListenersSetup) {
         _dragListenersSetup = true;
-        requestAnimationFrame(() => {
-            setupDragPan('cp-container-desk', 'cp-img-desk', 'desk');
-            setupDragPan('cp-container-mob', 'cp-img-mob', 'mob');
-        });
+        setupFrameDrag();
     }
+
+    // Aguardar a imagem carregar para posicionar o frame
+    if (fullImg.complete && fullImg.naturalWidth) {
+        requestAnimationFrame(() => positionFrameFromPercent(cropState.desk, 'desk'));
+    } else {
+        fullImg.onload = () => {
+            requestAnimationFrame(() => positionFrameFromPercent(cropState.desk, 'desk'));
+        };
+    }
+}
+
+function setupFrameDrag() {
+    const frame  = document.getElementById('crop-frame');
+    const canvas = document.getElementById('crop-canvas-wrap');
+    let isDragging = false, startX = 0, startY = 0, startL = 0, startT = 0;
+
+    const onDown = (cx, cy) => {
+        isDragging = true;
+        startX = cx; startY = cy;
+        startL = parseFloat(frame.style.left) || 0;
+        startT = parseFloat(frame.style.top)  || 0;
+        frame.style.cursor = 'grabbing';
+    };
+    const onMove = (cx, cy) => {
+        if (!isDragging) return;
+        const fw = frame.offsetWidth, fh = frame.offsetHeight;
+        const maxX = canvas.clientWidth  - fw;
+        const maxY = canvas.clientHeight - fh;
+        let newL = Math.max(0, Math.min(maxX, startL + (cx - startX)));
+        let newT = Math.max(0, Math.min(maxY, startT + (cy - startY)));
+        frame.style.left = newL + 'px';
+        frame.style.top  = newT + 'px';
+        // Salva em tempo real
+        const pos = frameToPercent();
+        cropState[_currentCropTab] = pos;
+    };
+    const onUp = () => { isDragging = false; frame.style.cursor = 'move'; };
+
+    frame.addEventListener('mousedown',  e => { e.preventDefault(); onDown(e.clientX, e.clientY); });
+    window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup',   onUp);
+
+    frame.addEventListener('touchstart', e => { e.preventDefault(); onDown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    window.addEventListener('touchmove', e => { if (isDragging) { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }}, { passive: false });
+    window.addEventListener('touchend',  onUp);
 }
 
 function closeCropModal() {
@@ -1007,7 +1110,7 @@ async function confirmCrop() {
         imgArr[idx] = { src: imgArr[idx], caption: '', positionDesktop: desk, positionMobile: mob };
     } else {
         imgArr[idx].positionDesktop = desk;
-        imgArr[idx].positionMobile = mob;
+        imgArr[idx].positionMobile  = mob;
     }
 
     await saveContent(false);
@@ -1016,75 +1119,7 @@ async function confirmCrop() {
     showToast('Enquadramento salvo!', 'success');
 }
 
-function setupDragPan(containerId, imgId, stateKey) {
-    const container = document.getElementById(containerId);
-    const img = document.getElementById(imgId);
-    if(!container || !img) return;
-
-    let isDragging = false;
-    let startX = 0, startY = 0;
-    
-    container.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        container.style.cursor = 'grabbing';
-    });
-
-    // Touch events for mobile compatibility
-    container.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        container.style.cursor = 'grabbing';
-    }, {passive:true});
-
-    const moveHandler = (clientX, clientY) => {
-        if (!isDragging) return;
-        
-        let dx = clientX - startX;
-        let dy = clientY - startY;
-
-        // Sensibilidade baseada nas dimensões pra ficar intuitivo
-        // Drag for dir = diminui % do X e vice versa
-        let pxPerPctX = container.clientWidth / 50; 
-        let pxPerPctY = container.clientHeight / 50;
-
-        let pctX = parseFloat(img.dataset.x) - (dx / pxPerPctX);
-        let pctY = parseFloat(img.dataset.y) - (dy / pxPerPctY);
-
-        // Clamp
-        pctX = Math.max(0, Math.min(100, pctX));
-        pctY = Math.max(0, Math.min(100, pctY));
-
-        img.style.objectPosition = `${pctX.toFixed(1)}% ${pctY.toFixed(1)}%`;
-        cropState[stateKey] = `${pctX.toFixed(1)}% ${pctY.toFixed(1)}%`;
-
-        // Don't update dataset.x / .y yet to keep the initial reference, OR update it and reset startX:
-        img.dataset.x = pctX;
-        img.dataset.y = pctY;
-        startX = clientX;
-        startY = clientY;
-    };
-
-    container.addEventListener('mousemove', (e) => {
-        moveHandler(e.clientX, e.clientY);
-    });
-    container.addEventListener('touchmove', (e) => {
-        moveHandler(e.touches[0].clientX, e.touches[0].clientY);
-    }, {passive:true});
-
-    const stopHandler = () => {
-        isDragging = false;
-        container.style.cursor = 'grab';
-    };
-
-    container.addEventListener('mouseup', stopHandler);
-    container.addEventListener('mouseleave', stopHandler);
-    container.addEventListener('touchend', stopHandler);
-}
-
-// Drag setup é feito em openCropModal via requestAnimationFrame
+// Drag setup é feito em openCropModal via setupFrameDrag()
 
 // ─────────────────────────────────────────────────────────────
 // SAVE

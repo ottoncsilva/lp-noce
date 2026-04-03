@@ -108,6 +108,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <span class="swipe-text">Deslize</span>
                         <svg class="swipe-hand" viewBox="0 0 24 24"><path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.21 0-.62-.35-1.18-.91-1.42z"/></svg>
                     </div>
+                    <button class="amb-arrow amb-arrow-prev" aria-label="Anterior">&#8592;</button>
+                    <button class="amb-arrow amb-arrow-next" aria-label="Próxima">&#8594;</button>
                     <div class="ambiente-track">
                         ${secData.images && secData.images.length > 0
                             ? secData.images.map(img => {
@@ -133,6 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </section>
             `;
             ambContainer.insertAdjacentHTML('beforeend', html);
+
         });
 
         // Acabamentos
@@ -273,7 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // 3. Ambientes (Horizontal Scroll & Pin)
+        // 3. Ambientes (Horizontal Scroll & Pin — apenas mobile / setas no desktop)
         const ambientes = document.querySelectorAll('.ambiente-pin-wrap');
         
         let mm = gsap.matchMedia();
@@ -282,39 +285,49 @@ document.addEventListener("DOMContentLoaded", async () => {
             const track = section.querySelector('.ambiente-track');
             const entryWord = section.querySelector('.ambiente-word');
             const swipeIcon = section.querySelector('.swipe-icon-container');
-            const images = section.querySelectorAll('.gallery-item img');
-            
+
+            // ── DESKTOP: Navegação por setas (sem pin/scroll)
             mm.add("(min-width: 769px)", () => {
-                const wipeTl = gsap.timeline({
+                // Scroll horizontal suave via botões de seta
+                const btnPrev = section.querySelector('.amb-arrow-prev');
+                const btnNext = section.querySelector('.amb-arrow-next');
+
+                const SCROLL_STEP = () => window.innerWidth * 0.8;
+
+                if (btnNext) {
+                    btnNext.addEventListener('click', () => {
+                        track.scrollBy({ left: SCROLL_STEP(), behavior: 'smooth' });
+                    });
+                }
+                if (btnPrev) {
+                    btnPrev.addEventListener('click', () => {
+                        track.scrollBy({ left: -SCROLL_STEP(), behavior: 'smooth' });
+                    });
+                }
+
+                // Mostrar/esconder setas conforme posição
+                const updateArrows = () => {
+                    if (!btnPrev || !btnNext) return;
+                    btnPrev.style.opacity = track.scrollLeft > 10 ? '1' : '0.3';
+                    btnNext.style.opacity = track.scrollLeft < (track.scrollWidth - track.clientWidth - 10) ? '1' : '0.3';
+                };
+                track.addEventListener('scroll', updateArrows, { passive: true });
+                requestAnimationFrame(updateArrows);
+
+                // Animação de entrada do título (sem scroll-pin)
+                gsap.from(entryWord, {
                     scrollTrigger: {
                         trigger: section,
-                        start: "top top",
-                        end: "+=300%",
-                        pin: true,
-                        scrub: 1,
-                        onEnter: () => swipeIcon.classList.add('visible'),
-                        onLeave: () => swipeIcon.classList.remove('visible'),
-                        onEnterBack: () => swipeIcon.classList.add('visible'),
-                        onLeaveBack: () => swipeIcon.classList.remove('visible')
-                    }
-                });
-
-                wipeTl.to(entryWord, { scale: 0.5, opacity: 0, duration: 1 })
-                      .to(track, {
-                          x: () => -(track.scrollWidth - window.innerWidth) + "px",
-                          ease: "none",
-                          duration: 4
-                      }, "<"); 
-
-                images.forEach((img, i) => {
-                    wipeTl.fromTo(img, 
-                        { scale: 1.3, transformOrigin: "left center" }, 
-                        { scale: 1, ease: "none", duration: 4 }, 
-                        "<0.2"
-                    );
+                        start: 'top 80%',
+                        end: 'top 20%',
+                        scrub: true
+                    },
+                    opacity: 0,
+                    y: 30
                 });
             });
 
+            // ── MOBILE: Swipe nativo + ícone indicador
             mm.add("(max-width: 768px)", () => {
                 ScrollTrigger.create({
                     trigger: section,

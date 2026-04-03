@@ -42,6 +42,13 @@
     .ambiente-entry h2 {
         font-size: clamp(3rem, 15vw, 6rem);
     }
+    /* Setas só no desktop — ocultar no mobile */
+    .amb-arrow { display: none !important; }
+    /* Mobile track: sem overflow-x preso (o swipe é nativo) */
+    .ambiente-track {
+        overflow-x: auto;
+        padding-left: 0;
+    }
 
     .hero-logo {
         font-size: 25vw;
