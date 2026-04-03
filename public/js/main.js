@@ -44,9 +44,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const taglineEl = document.querySelector('.hero-tagline');
         if(taglineEl) taglineEl.textContent = data.tagline || '';
         
-        // Logo size custom variable
-        if (data.heroLogoSize) {
-            document.documentElement.style.setProperty('--hero-logo-size', data.heroLogoSize);
+        // Logo size custom variables
+        if (data.heroLogoSizeDesktop) {
+            document.documentElement.style.setProperty('--hero-logo-size-desktop', data.heroLogoSizeDesktop);
+        } else {
+            document.documentElement.style.setProperty('--hero-logo-size-desktop', '12vw');
+        }
+        if (data.heroLogoSizeMobile) {
+            document.documentElement.style.setProperty('--hero-logo-size-mobile', data.heroLogoSizeMobile);
+        } else {
+            document.documentElement.style.setProperty('--hero-logo-size-mobile', '25vw');
         }
 
         // Manifesto — SAFE split (no crash if "não" missing)

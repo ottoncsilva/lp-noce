@@ -246,8 +246,13 @@ function buildHeroPanel(container) {
                 </div>
 
                 <div class="form-group">
-                    <label>Tamanho da Logo no Desktop/Mobile (ex: 12vw ou 180px)</label>
-                    <input type="text" id="inp-hero-logo-size" value="${siteData.heroLogoSize || '12vw'}" placeholder="Ex: 12vw">
+                    <label>Tamanho da Logo no Desktop/Tablet (ex: 12vw ou 200px)</label>
+                    <input type="text" id="inp-hero-logo-size-desktop" value="${siteData.heroLogoSizeDesktop || '12vw'}" placeholder="Ex: 12vw">
+                </div>
+                
+                <div class="form-group">
+                    <label>Tamanho da Logo no Mobile (ex: 25vw ou 150px)</label>
+                    <input type="text" id="inp-hero-logo-size-mobile" value="${siteData.heroLogoSizeMobile || '25vw'}" placeholder="Ex: 25vw">
                 </div>
             </div>
 
@@ -841,8 +846,11 @@ async function saveContent(showMsg = true) {
     if (heroColor) siteData.heroBgColor = heroColor.value;
 
     // Collect hero logo size
-    const heroLogoSize = document.getElementById('inp-hero-logo-size');
-    if (heroLogoSize) siteData.heroLogoSize = heroLogoSize.value;
+    const heroLogoSizeDesktop = document.getElementById('inp-hero-logo-size-desktop');
+    if (heroLogoSizeDesktop) siteData.heroLogoSizeDesktop = heroLogoSizeDesktop.value;
+
+    const heroLogoSizeMobile = document.getElementById('inp-hero-logo-size-mobile');
+    if (heroLogoSizeMobile) siteData.heroLogoSizeMobile = heroLogoSizeMobile.value;
 
     // Collect labels for all sections
     const order = siteData.sectionOrder || Object.keys(siteData.sections);

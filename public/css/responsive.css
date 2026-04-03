@@ -42,6 +42,10 @@
     .hero-logo {
         font-size: 25vw;
     }
+    
+    .hero-content .main-logo-img {
+        height: var(--hero-logo-size-mobile, 25vw);
+    }
 
     .section-entry-word {
         font-size: clamp(2rem, 10vw, 4rem);

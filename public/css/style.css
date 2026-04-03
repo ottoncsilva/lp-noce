@@ -154,6 +154,13 @@ html.lenis { height: auto; }
     letter-spacing: 0.05em;
     line-height: 1;
 }
+.hero-content .main-logo-img {
+    height: var(--hero-logo-size-desktop, 12vw);
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 2rem;
+    transition: height 0.3s ease;
+}
 .hero-tagline {
     font-size: 14px;
     letter-spacing: 0.25em;
