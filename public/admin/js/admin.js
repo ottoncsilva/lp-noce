@@ -6,6 +6,13 @@
 let siteData = {};
 let currentPanel = 'geral';
 
+// Debounced save — prevents rapid consecutive saves (e.g. typing in a caption field)
+let _saveDebounceTimer = null;
+function debouncedSave(delay = 800) {
+    clearTimeout(_saveDebounceTimer);
+    _saveDebounceTimer = setTimeout(() => saveContent(false), delay);
+}
+
 // ── Ordem padrão das categorias de ambiente
 const DEFAULT_SECTIONS = ['cozinha', 'living', 'closet', 'banheiro', 'corporativo'];
 
@@ -658,11 +665,18 @@ function setupGalleryDrag(secId) {
         const tgtIdx = parseInt(target.dataset.idx);
         const images = siteData.sections[secId].images;
 
-        // Reorder
+        // Reorder in memory
         const [moved] = images.splice(srcIdx, 1);
         images.splice(tgtIdx, 0, moved);
 
-        await saveContent(false);
+        try {
+            await saveContent(false);
+        } catch (err) {
+            // Revert in-memory reorder if save fails
+            const [reverted] = images.splice(tgtIdx, 1);
+            images.splice(srcIdx, 0, reverted);
+            showToast('Erro ao reordenar — alteração revertida', 'error');
+        }
         rebuildCurrentPanel(secId);
     });
 
@@ -717,7 +731,13 @@ function setupListDrag(secId) {
         const [moved] = items.splice(srcIdx, 1);
         items.splice(tgtIdx, 0, moved);
 
-        await saveContent(false);
+        try {
+            await saveContent(false);
+        } catch (err) {
+            const [reverted] = items.splice(tgtIdx, 1);
+            items.splice(srcIdx, 0, reverted);
+            showToast('Erro ao reordenar — alteração revertida', 'error');
+        }
         rebuildCurrentPanel(secId);
     });
 
@@ -818,23 +838,23 @@ async function deleteImage(section, imgPath) {
     } catch (err) { showToast('Erro ao apagar imagem', 'error'); }
 }
 
-async function updateImageField(section, index, field, value) {
+function updateImageField(section, index, field, value) {
     const imgArr = siteData.sections[section].images;
     if (typeof imgArr[index] === 'string') {
         imgArr[index] = { src: imgArr[index], caption: '', position: 'center center' };
     }
     imgArr[index][field] = value;
-    await saveContent(false);
+    debouncedSave();
 }
 
 // ─────────────────────────────────────────────────────────────
 // ITEM ACTIONS (Acabamentos / Parceiros)
 // ─────────────────────────────────────────────────────────────
 
-async function updateItemField(section, index, field, value) {
+function updateItemField(section, index, field, value) {
     const list = getItemList(section);
     list[index][field] = value;
-    await saveContent(false);
+    debouncedSave();
 }
 
 async function uploadItemImage(e, section, index) {
@@ -1225,10 +1245,10 @@ async function addProcessoItem() {
     rebuildCurrentPanel('conteudo');
 }
 
-async function updateConfigItem(section, index, field, value) {
+function updateConfigItem(section, index, field, value) {
     if (siteData[section] && siteData[section].items && siteData[section].items[index]) {
         siteData[section].items[index][field] = value;
-        await saveContent(false);
+        debouncedSave();
     }
 }
 

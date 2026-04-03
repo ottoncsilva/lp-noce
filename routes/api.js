@@ -18,9 +18,18 @@ adminUsers[process.env.ADMIN_USER] = process.env.ADMIN_PASS;
 const protect = basicAuth({ users: adminUsers, challenge: true });
 
 // Multer — memory storage for Sharp
+const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif', 'image/svg+xml']);
+
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 15 * 1024 * 1024 } // 15 MB
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15 MB
+    fileFilter: (req, file, cb) => {
+        if (ALLOWED_MIME_TYPES.has(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error(`Tipo de arquivo não permitido: ${file.mimetype}`), false);
+        }
+    }
 });
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -63,6 +72,10 @@ router.post('/content', protect, (req, res) => {
         const dataDir = path.join(__dirname, '..', 'data');
         if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
+        // Backup before overwriting to prevent data loss
+        if (fs.existsSync(CONTENT_FILE)) {
+            fs.copyFileSync(CONTENT_FILE, CONTENT_FILE + '.bak');
+        }
         fs.writeFileSync(CONTENT_FILE, JSON.stringify(newContent, null, 2), 'utf8');
         res.json({ success: true });
     } catch (err) {
@@ -72,7 +85,16 @@ router.post('/content', protect, (req, res) => {
 });
 
 // POST /api/upload/:section — upload images (any valid section id)
-router.post('/upload/:section', protect, upload.array('photos', 30), async (req, res) => {
+router.post('/upload/:section', protect, (req, res, next) => {
+    upload.array('photos', 30)(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ error: `Erro de upload: ${err.message}` });
+        } else if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        next();
+    });
+}, async (req, res) => {
     try {
         const section = sanitizeSectionId(req.params.section);
         if (!section) return res.status(400).json({ error: 'ID de seção inválido' });

@@ -1,3 +1,21 @@
+function escHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function safeCssUrl(url) {
+    if (typeof url !== 'string') return '';
+    // Only allow relative paths starting with /images/ or absolute https URLs without quotes/parens
+    if (/^\/images\/[\w\-/.]+$/.test(url)) return url;
+    if (/^https?:\/\/[^'"()]+$/.test(url)) return url;
+    return '';
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     // 1. Initialize Lenis
     const lenis = new Lenis({
@@ -13,13 +31,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 2. Load Content
     try {
         const response = await fetch('/api/content');
-        if (!response.ok) throw new Error('Network error');
+        if (!response.ok) throw new Error('Network error ' + response.status);
         const data = await response.json();
-        
+
         populateDOM(data);
         setTimeout(initAnimations, 100);
     } catch (err) {
         console.error("Error loading content:", err);
+        // Show user-visible fallback so the page is not silently blank
+        const hero = document.querySelector('.hero');
+        if (hero) {
+            const notice = document.createElement('p');
+            notice.style.cssText = 'position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:0.8rem;';
+            notice.textContent = 'Conteúdo temporariamente indisponível.';
+            hero.appendChild(notice);
+        }
     }
 
     function populateDOM(data) {
@@ -34,8 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         // Hero background image
         const heroOverlay = document.querySelector('.hero-overlay');
-        if(data.heroBg && heroBgEl) {
-            heroBgEl.style.backgroundImage = `url('${data.heroBg}')`;
+        const safeBg = data.heroBg ? safeCssUrl(data.heroBg) : '';
+        if(safeBg && heroBgEl) {
+            heroBgEl.style.backgroundImage = `url('${safeBg}')`;
             heroBgEl.style.opacity = 1;
             if(heroOverlay) heroOverlay.style.display = 'block';
         } else {
@@ -99,10 +126,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const secData = data.sections ? data.sections[secName] : null;
             if(!secData) return;
 
+            const sectionLabel = escHtml(secData.label || secName);
             const html = `
-                <section class="section ambiente-pin-wrap" id="sec-${secName}">
+                <section class="section ambiente-pin-wrap" id="sec-${escHtml(secName)}">
                     <div class="ambiente-entry">
-                        <h2 class="ambiente-word">${secData.label || secName}</h2>
+                        <h2 class="ambiente-word">${sectionLabel}</h2>
                     </div>
                     <div class="swipe-icon-container">
                         <span class="swipe-text">Deslize</span>
@@ -113,17 +141,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="ambiente-track">
                         ${secData.images && secData.images.length > 0
                             ? secData.images.map(img => {
-                                const imgSrc = typeof img === 'string' ? img : img.src;
-                                const imgCap = typeof img === 'object' && img.caption ? img.caption : '';
-                                
+                                const imgSrc = escHtml(typeof img === 'string' ? img : img.src);
+                                const imgCap = typeof img === 'object' && img.caption ? escHtml(img.caption) : '';
+
                                 const legacyPos = typeof img === 'object' && img.position ? img.position : 'center center';
                                 const posDesk = typeof img === 'object' && img.positionDesktop ? img.positionDesktop : legacyPos;
                                 const posMob = typeof img === 'object' && img.positionMobile ? img.positionMobile : legacyPos;
+                                // Only allow safe CSS position values
+                                const safePosDesk = /^[\w% ]+$/.test(posDesk) ? posDesk : 'center center';
+                                const safePosMob = /^[\w% ]+$/.test(posMob) ? posMob : 'center center';
 
                                 return `
                                 <div class="gallery-item">
-                                    <img src="${imgSrc}" alt="${secData.label || secName} - Noce Mobili" loading="lazy"
-                                        style="--pos-desk: ${posDesk}; --pos-mob: ${posMob};" width="1920" height="1080">
+                                    <img src="${imgSrc}" alt="${sectionLabel} - Noce Mobili" loading="lazy"
+                                        style="--pos-desk: ${safePosDesk}; --pos-mob: ${safePosMob};" width="1920" height="1080">
                                     ${imgCap ? `<div class="micro-caption">${imgCap}</div>` : ''}
                                     <div class="gallery-sweep-line"></div>
                                 </div>
@@ -148,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 const swatchHTML = `
                     <div class="swatch" style="left: ${left}%; top: ${top}%; background: ${bg}; background-size: cover; background-position: center;" data-speed="${0.5 + Math.random() * 1.5}">
-                        <div class="name">${item.name}</div>
+                        <div class="name">${escHtml(item.name)}</div>
                     </div>
                 `;
                 wrapper.insertAdjacentHTML('beforeend', swatchHTML);
@@ -160,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const spot = document.querySelector('.parceiros-spotlight');
             data.parceiros.items.forEach(p => {
                 const img = p.image || '/images/placeholder.jpg';
-                spot.insertAdjacentHTML('beforeend', `<img src="${img}" class="parc-logo" alt="Parceiro ${p.name}" loading="lazy">`);
+                spot.insertAdjacentHTML('beforeend', `<img src="${escHtml(img)}" class="parc-logo" alt="Parceiro ${escHtml(p.name || '')}" loading="lazy">`);
             });
         }
 
@@ -170,9 +201,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (procContainer) {
                 data.processo.items.forEach(item => {
                     const html = `<div class="step">
-                                    <div class="step-num">${item.num}</div>
-                                    <p>${item.title}</p>
-                                    ${item.desc ? `<span style="display:block; font-size:0.75rem; margin-top:5px; opacity:0.8;">${item.desc}</span>` : ''}
+                                    <div class="step-num">${escHtml(item.num)}</div>
+                                    <p>${escHtml(item.title)}</p>
+                                    ${item.desc ? `<span style="display:block; font-size:0.75rem; margin-top:5px; opacity:0.8;">${escHtml(item.desc)}</span>` : ''}
                                   </div>`;
                     procContainer.insertAdjacentHTML('beforeend', html);
                 });
@@ -197,8 +228,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const isOpen = idx === 0 ? 'open' : '';
                     const html = `
                     <details class="faq-item" ${isOpen}>
-                        <summary>${item.q}</summary>
-                        <p>${item.a}</p>
+                        <summary>${escHtml(item.q)}</summary>
+                        <p>${escHtml(item.a)}</p>
                     </details>`;
                     faqContainer.insertAdjacentHTML('beforeend', html);
                 });
