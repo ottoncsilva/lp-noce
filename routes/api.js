@@ -81,12 +81,12 @@ router.post('/upload/:section', protect, upload.array('photos', 30), async (req,
         const uploadedFiles = [];
 
         for (const file of req.files) {
-            const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
+            const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
             const filepath = path.join(dir, filename);
 
             await sharp(file.buffer)
                 .resize({ width: 1920, withoutEnlargement: true })
-                .jpeg({ quality: 82, progressive: true })
+                .webp({ quality: 85 })
                 .toFile(filepath);
 
             uploadedFiles.push(`/images/${section}/${filename}`);

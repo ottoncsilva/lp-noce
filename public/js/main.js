@@ -33,11 +33,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.querySelector('.hero').style.backgroundColor = data.heroBgColor;
         }
         // Hero background image
+        const heroOverlay = document.querySelector('.hero-overlay');
         if(data.heroBg && heroBgEl) {
             heroBgEl.style.backgroundImage = `url('${data.heroBg}')`;
+            heroBgEl.style.opacity = 1;
+            if(heroOverlay) heroOverlay.style.display = 'block';
+        } else {
+            if(heroOverlay) heroOverlay.style.display = 'none'; // Se for cor sólida, tira o overlay escuro
         }
         const taglineEl = document.querySelector('.hero-tagline');
         if(taglineEl) taglineEl.textContent = data.tagline || '';
+        
+        // Logo size custom variable
+        if (data.heroLogoSize) {
+            document.documentElement.style.setProperty('--hero-logo-size', data.heroLogoSize);
+        }
 
         // Manifesto — SAFE split (no crash if "não" missing)
         if(data.manifesto && data.manifesto.headline) {
@@ -148,13 +158,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 1. Hero Animation
         const tlHero = gsap.timeline();
         tlHero.to('.hero-bg', { opacity: 1, duration: 2, ease: "power2.inOut" })
-              .from('.hero-logo', { opacity: 0, scale: 0.9, duration: 1.5, ease: "power3.out" }, "-=1")
+              .from('.main-logo-img', { opacity: 0, scale: 0.9, duration: 1.5, ease: "power3.out" }, "-=1")
               .from('.hero-tagline', { opacity: 0, y: 20, duration: 1 }, "-=0.5");
         
         // Ken burns effect
-        gsap.to('.hero-bg', {
-            scale: 1.05, duration: 20, repeat: -1, yoyo: true, ease: "none"
-        });
+        if (document.querySelector('.hero-bg').style.backgroundImage !== 'none' && document.querySelector('.hero-bg').style.backgroundImage !== '') {
+            gsap.to('.hero-bg', {
+                scale: 1.05, duration: 20, repeat: -1, yoyo: true, ease: "none"
+            });
+        }
 
         // 2. Manifesto
         const tlManifesto = gsap.timeline({

@@ -244,6 +244,11 @@ function buildHeroPanel(container) {
                             placeholder="#233728" onchange="syncColorFromHex(this.value)">
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label>Tamanho da Logo no Desktop/Mobile (ex: 12vw ou 180px)</label>
+                    <input type="text" id="inp-hero-logo-size" value="${siteData.heroLogoSize || '12vw'}" placeholder="Ex: 12vw">
+                </div>
             </div>
 
             <div class="card">
@@ -834,6 +839,10 @@ async function saveContent(showMsg = true) {
     // Collect hero color
     const heroColor = document.getElementById('inp-hero-color');
     if (heroColor) siteData.heroBgColor = heroColor.value;
+
+    // Collect hero logo size
+    const heroLogoSize = document.getElementById('inp-hero-logo-size');
+    if (heroLogoSize) siteData.heroLogoSize = heroLogoSize.value;
 
     // Collect labels for all sections
     const order = siteData.sectionOrder || Object.keys(siteData.sections);
