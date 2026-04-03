@@ -922,27 +922,53 @@ async function removeHeroBg() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CROP MODAL VISUAL
+// CROP MODAL VISUAL (DRAGGABLE)
 // ─────────────────────────────────────────────────────────────
 
-let cropState = { secId: '', idx: -1, desk: 'center center', mob: 'center center' };
+let cropState = { secId: '', idx: -1, desk: '50% 50%', mob: '50% 50%' };
+
+// Convert basic words to percent if legacy
+function posToPercent(posStr) {
+    if (!posStr) return { x: 50, y: 50 };
+    let x = 50, y = 50;
+    if (posStr.includes('left')) x = 0;
+    if (posStr.includes('right')) x = 100;
+    if (posStr.includes('top')) y = 0;
+    if (posStr.includes('bottom')) y = 100;
+    
+    const parts = posStr.split(' ');
+    if (parts.length === 2) {
+        if (!isNaN(parseFloat(parts[0]))) x = parseFloat(parts[0]);
+        if (!isNaN(parseFloat(parts[1]))) y = parseFloat(parts[1]);
+    }
+    return { x, y };
+}
 
 function openCropModal(secId, idx, deskPos, mobPos) {
-    cropState = { secId, idx, desk: deskPos, mob: mobPos };
+    if(!deskPos || deskPos === 'center center') deskPos = '50% 50%';
+    if(!mobPos || mobPos === 'center center') mobPos = '50% 50%';
     
-    // Highlight UI Desk
-    document.querySelectorAll('#crop-grid-desk .crop-cell').forEach(el => {
-        el.classList.remove('active');
-        if (el.dataset.pos === deskPos) el.classList.add('active');
-    });
-    document.getElementById('crop-val-desk').textContent = deskPos;
+    cropState = { secId, idx, desk: deskPos, mob: mobPos };
 
-    // Highlight UI Mob
-    document.querySelectorAll('#crop-grid-mob .crop-cell').forEach(el => {
-        el.classList.remove('active');
-        if (el.dataset.pos === mobPos) el.classList.add('active');
-    });
-    document.getElementById('crop-val-mob').textContent = mobPos;
+    // Get image src
+    let src = '';
+    const item = siteData.sections[secId].images[idx];
+    if (typeof item === 'string') src = item;
+    else src = item.src;
+
+    // Desk Setup
+    const deskImg = document.getElementById('cp-img-desk');
+    deskImg.src = src;
+    deskImg.style.objectPosition = deskPos;
+    deskImg.dataset.x = posToPercent(deskPos).x;
+    deskImg.dataset.y = posToPercent(deskPos).y;
+
+    // Mob Setup
+    const mobImg = document.getElementById('cp-img-mob');
+    mobImg.src = src;
+    mobImg.style.objectPosition = mobPos;
+    mobImg.dataset.x = posToPercent(mobPos).x;
+    mobImg.dataset.y = posToPercent(mobPos).y;
 
     document.getElementById('crop-modal').classList.add('open');
 }
@@ -969,26 +995,78 @@ async function confirmCrop() {
     showToast('Enquadramento salvo!', 'success');
 }
 
-// Bind cell click events (run once)
+function setupDragPan(containerId, imgId, stateKey) {
+    const container = document.getElementById(containerId);
+    const img = document.getElementById(imgId);
+    if(!container || !img) return;
+
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        container.style.cursor = 'grabbing';
+    });
+
+    // Touch events for mobile compatibility
+    container.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        container.style.cursor = 'grabbing';
+    }, {passive:true});
+
+    const moveHandler = (clientX, clientY) => {
+        if (!isDragging) return;
+        
+        let dx = clientX - startX;
+        let dy = clientY - startY;
+
+        // Sensibilidade baseada nas dimensões pra ficar intuitivo
+        // Drag for dir = diminui % do X e vice versa
+        let pxPerPctX = container.clientWidth / 50; 
+        let pxPerPctY = container.clientHeight / 50;
+
+        let pctX = parseFloat(img.dataset.x) - (dx / pxPerPctX);
+        let pctY = parseFloat(img.dataset.y) - (dy / pxPerPctY);
+
+        // Clamp
+        pctX = Math.max(0, Math.min(100, pctX));
+        pctY = Math.max(0, Math.min(100, pctY));
+
+        img.style.objectPosition = `${pctX.toFixed(1)}% ${pctY.toFixed(1)}%`;
+        cropState[stateKey] = `${pctX.toFixed(1)}% ${pctY.toFixed(1)}%`;
+
+        // Don't update dataset.x / .y yet to keep the initial reference, OR update it and reset startX:
+        img.dataset.x = pctX;
+        img.dataset.y = pctY;
+        startX = clientX;
+        startY = clientY;
+    };
+
+    container.addEventListener('mousemove', (e) => {
+        moveHandler(e.clientX, e.clientY);
+    });
+    container.addEventListener('touchmove', (e) => {
+        moveHandler(e.touches[0].clientX, e.touches[0].clientY);
+    }, {passive:true});
+
+    const stopHandler = () => {
+        isDragging = false;
+        container.style.cursor = 'grab';
+    };
+
+    container.addEventListener('mouseup', stopHandler);
+    container.addEventListener('mouseleave', stopHandler);
+    container.addEventListener('touchend', stopHandler);
+}
+
+// Bind drag logic
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('#crop-grid-desk .crop-cell').forEach(cell => {
-        cell.addEventListener('click', (e) => {
-            const pos = e.target.dataset.pos;
-            cropState.desk = pos;
-            document.querySelectorAll('#crop-grid-desk .crop-cell').forEach(el => el.classList.remove('active'));
-            e.target.classList.add('active');
-            document.getElementById('crop-val-desk').textContent = pos;
-        });
-    });
-    document.querySelectorAll('#crop-grid-mob .crop-cell').forEach(cell => {
-        cell.addEventListener('click', (e) => {
-            const pos = e.target.dataset.pos;
-            cropState.mob = pos;
-            document.querySelectorAll('#crop-grid-mob .crop-cell').forEach(el => el.classList.remove('active'));
-            e.target.classList.add('active');
-            document.getElementById('crop-val-mob').textContent = pos;
-        });
-    });
+    setupDragPan('cp-container-desk', 'cp-img-desk', 'desk');
+    setupDragPan('cp-container-mob', 'cp-img-mob', 'mob');
 });
 
 // ─────────────────────────────────────────────────────────────

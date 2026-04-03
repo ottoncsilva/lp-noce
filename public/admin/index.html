@@ -548,36 +548,29 @@
         </div>
     </div>
 
-    <!-- Modal: Crop Visual 3x3 -->
+    <!-- Modal: Crop Visual Interativo -->
     <div class="modal-overlay" id="crop-modal">
-        <div class="modal" style="width:500px; max-width:95%;">
+        <div class="modal" style="width:600px; max-width:95%;">
             <h3>Foco e Enquadramento da Imagem</h3>
-            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem;">Defina qual região da imagem é mais importante. Ela será o ponto de ancoragem nos diferentes formatos de tela.</p>
+            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem;">Arraste a própria imagem dentro das áreas tracejadas para definir qual parte deve ficar visível.</p>
             
             <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:1.5rem;">
-                
                 <!-- Desktop -->
-                <div style="flex:1; min-width:180px;">
+                <div style="flex:1; min-width:250px;">
                     <h4 style="font-size:0.9rem; margin-bottom:5px;">Desktop e iPad (Paisagem)</h4>
-                    <p style="font-size:0.75rem; color:#888; margin-bottom:10px;">Foca o corte mais horizontal.</p>
-                    <div class="crop-grid" id="crop-grid-desk" style="width:100%; height:100px;">
-                        <div class="crop-cell" data-pos="top left"></div><div class="crop-cell" data-pos="top center"></div><div class="crop-cell" data-pos="top right"></div>
-                        <div class="crop-cell" data-pos="center left"></div><div class="crop-cell" data-pos="center center"></div><div class="crop-cell" data-pos="center right"></div>
-                        <div class="crop-cell" data-pos="bottom left"></div><div class="crop-cell" data-pos="bottom center"></div><div class="crop-cell" data-pos="bottom right"></div>
+                    <p style="font-size:0.75rem; color:#888; margin-bottom:10px;">Arraste para ajustar</p>
+                    <div class="crop-preview-container" id="cp-container-desk" style="width:100%; aspect-ratio:16/9; border:2px dashed var(--noce-green); overflow:hidden; cursor:grab; position:relative; background:#eee;">
+                        <img id="cp-img-desk" src="" style="width:100%; height:100%; object-fit:cover; object-position:50% 50%; pointer-events:none;">
                     </div>
-                    <div id="crop-val-desk" style="margin-top:5px; font-size:0.75rem; font-weight:600; text-align:center;">center center</div>
                 </div>
 
                 <!-- Mobile -->
-                <div style="flex:1; min-width:180px;">
+                <div style="width:180px;">
                     <h4 style="font-size:0.9rem; margin-bottom:5px;">Mobile (Retrato)</h4>
-                    <p style="font-size:0.75rem; color:#888; margin-bottom:10px;">Foca o corte altamente vertical.</p>
-                    <div class="crop-grid" id="crop-grid-mob" style="width:80px; height:120px; margin:0 auto;">
-                        <div class="crop-cell" data-pos="top left"></div><div class="crop-cell" data-pos="top center"></div><div class="crop-cell" data-pos="top right"></div>
-                        <div class="crop-cell" data-pos="center left"></div><div class="crop-cell" data-pos="center center"></div><div class="crop-cell" data-pos="center right"></div>
-                        <div class="crop-cell" data-pos="bottom left"></div><div class="crop-cell" data-pos="bottom center"></div><div class="crop-cell" data-pos="bottom right"></div>
+                    <p style="font-size:0.75rem; color:#888; margin-bottom:10px;">Arraste para ajustar</p>
+                    <div class="crop-preview-container" id="cp-container-mob" style="width:100%; aspect-ratio:9/16; border:2px dashed var(--noce-green); overflow:hidden; cursor:grab; position:relative; background:#eee; margin:0 auto;">
+                        <img id="cp-img-mob" src="" style="width:100%; height:100%; object-fit:cover; object-position:50% 50%; pointer-events:none;">
                     </div>
-                    <div id="crop-val-mob" style="margin-top:5px; font-size:0.75rem; font-weight:600; text-align:center;">center center</div>
                 </div>
             </div>
 
