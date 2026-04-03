@@ -357,15 +357,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 requestAnimationFrame(updateArrows);
 
                 // Animação de entrada do título (sem scroll-pin)
-                gsap.from(entryWord, {
+                gsap.to(entryWord, {
                     scrollTrigger: {
                         trigger: section,
-                        start: 'top 80%',
-                        end: 'top 20%',
+                        start: "top center",
+                        end: "top top",
                         scrub: true
                     },
-                    opacity: 0,
-                    y: 30
+                    scale: 0.6,
+                    opacity: 0.1
                 });
             });
 
