@@ -57,6 +57,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         // Manifesto — SAFE split (no crash if "não" missing)
+        // Textos Globais
+        const texts = data.texts || {};
+        
+        // Povoando Títulos
+        const titleMaterialidade = document.querySelector('.acabamentos-sec .section-entry-word');
+        if (titleMaterialidade) titleMaterialidade.textContent = texts.materialidadeTitle || 'MATERIALIDADE';
+        
+        const titleParceiros = document.querySelector('.parceiros-title');
+        if (titleParceiros) titleParceiros.textContent = texts.parceirosTitle || 'Parceiros';
+        
+        const titleFaq = document.querySelector('.faq-title');
+        if (titleFaq) titleFaq.textContent = texts.faqTitle || 'Perguntas Frequentes';
+
+        const titleProcesso = document.querySelector('.proc-title');
+        if (titleProcesso) titleProcesso.textContent = texts.processoTitle || 'O Nosso Processo';
+        
+        const midCtaEl = document.getElementById('cta-mid-text');
+        if (midCtaEl) midCtaEl.textContent = texts.midCta || '17 anos criando ambientes únicos';
+
+        // Manifesto
         if(data.manifesto && data.manifesto.headline) {
             const headline = data.manifesto.headline;
             const parts = headline.split('não');
@@ -93,11 +113,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ? secData.images.map(img => {
                                 const imgSrc = typeof img === 'string' ? img : img.src;
                                 const imgCap = typeof img === 'object' && img.caption ? img.caption : '';
-                                const imgPos = typeof img === 'object' && img.position ? img.position : 'center center';
+                                
+                                const legacyPos = typeof img === 'object' && img.position ? img.position : 'center center';
+                                const posDesk = typeof img === 'object' && img.positionDesktop ? img.positionDesktop : legacyPos;
+                                const posMob = typeof img === 'object' && img.positionMobile ? img.positionMobile : legacyPos;
+
                                 return `
                                 <div class="gallery-item">
                                     <img src="${imgSrc}" alt="${secData.label || secName} - Noce Mobili" loading="lazy"
-                                        style="object-position: ${imgPos};" width="1920" height="1080">
+                                        style="--pos-desk: ${posDesk}; --pos-mob: ${posMob};" width="1920" height="1080">
                                     ${imgCap ? `<div class="micro-caption">${imgCap}</div>` : ''}
                                     <div class="gallery-sweep-line"></div>
                                 </div>
@@ -135,6 +159,57 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const img = p.image || '/images/placeholder.jpg';
                 spot.insertAdjacentHTML('beforeend', `<img src="${img}" class="parc-logo" alt="Parceiro ${p.name}" loading="lazy">`);
             });
+        }
+
+        // Processo
+        if(data.processo && data.processo.items && data.processo.items.length > 0) {
+            const procContainer = document.getElementById('proc-steps-container');
+            if (procContainer) {
+                data.processo.items.forEach(item => {
+                    const html = `<div class="step">
+                                    <div class="step-num">${item.num}</div>
+                                    <p>${item.title}</p>
+                                    ${item.desc ? `<span style="display:block; font-size:0.75rem; margin-top:5px; opacity:0.8;">${item.desc}</span>` : ''}
+                                  </div>`;
+                    procContainer.insertAdjacentHTML('beforeend', html);
+                });
+            }
+        } else {
+            // Fallback default structure
+            const procContainer = document.getElementById('proc-steps-container');
+            if (procContainer && procContainer.children.length === 0) {
+                procContainer.innerHTML = `
+                <div class="step"><div class="step-num">1</div><p>Escuta</p></div>
+                <div class="step"><div class="step-num">2</div><p>Curadoria</p></div>
+                <div class="step"><div class="step-num">3</div><p>Projeto</p></div>
+                <div class="step"><div class="step-num">4</div><p>Entrega</p></div>`;
+            }
+        }
+
+        // FAQ
+        if(data.faq && data.faq.items && data.faq.items.length > 0) {
+            const faqContainer = document.getElementById('faq-list-container');
+            if (faqContainer) {
+                data.faq.items.forEach((item, idx) => {
+                    const isOpen = idx === 0 ? 'open' : '';
+                    const html = `
+                    <details class="faq-item" ${isOpen}>
+                        <summary>${item.q}</summary>
+                        <p>${item.a}</p>
+                    </details>`;
+                    faqContainer.insertAdjacentHTML('beforeend', html);
+                });
+            }
+        } else {
+            // Fallback minimal
+            const faqContainer = document.getElementById('faq-list-container');
+            if (faqContainer && faqContainer.children.length === 0) {
+                faqContainer.innerHTML = `
+                    <details class="faq-item" open>
+                        <summary>Como adicionar perguntas?</summary>
+                        <p>Adicione-as no painel Admin > Conteúdo.</p>
+                    </details>`;
+            }
         }
 
         // CTA — safe access

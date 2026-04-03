@@ -1,15 +1,19 @@
 /* Responsive Media Queries - Mobile First & Tweaks */
 @media screen and (max-width: 768px) {
-    /* Manifesto */
+    /* Manifesto Fix Spacing */
+    .manifesto { padding: 4rem 5vw; }
     .manifesto-wrap {
         flex-direction: column;
         text-align: center;
         gap: 0;
+        margin-bottom: 2rem;
     }
     .manifesto-wrap h2 {
         white-space: normal;
         line-height: 1.2;
     }
+
+    .cta-mid { padding: 3rem 2rem; }
 
     /* Processo */
     .proc-steps {
@@ -71,9 +75,8 @@
         scroll-snap-align: center;
         height: 65vh;
     }
-    /* object-position é controlado via style inline pelo admin */
     .gallery-item img {
-        object-position: center center; /* fallback; sobrescrito por inline style */
+        object-position: var(--pos-mob, center center);
     }
 
     /* Ajuste para as novas legendas não sumirem */
@@ -83,6 +86,32 @@
         left: 1rem;
         width: auto;
         text-align: center;
+    }
+
+    /* Parceiros Fix Spacing */
+    .parceiros-title { top: 5vh; font-size: clamp(2rem, 8vw, 3rem); }
+    .parceiros-spotlight { padding-top: 10vh; padding-bottom: 15vh; }
+    .parc-logo { margin: 8vh 0; width: 140px; }
+
+    /* Materialidade Fix (Remove absolute positioning chaos on mobile) */
+    .acabamentos-wrapper {
+        min-height: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 0 5vw 4rem 5vw;
+    }
+    .swatch {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        width: 100%;
+        height: 200px;
+    }
+    .swatch .name { 
+        opacity: 1; /* always visible on mobile */
+        padding: 0.5rem; 
+        font-size: 10px; 
     }
 }
 

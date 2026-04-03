@@ -72,6 +72,11 @@ async function fetchContent() {
         if (!Array.isArray(siteData.acabamentos.items)) siteData.acabamentos.items = [];
         if (!siteData.parceiros)   siteData.parceiros   = { headline: '', items: [] };
         if (!Array.isArray(siteData.parceiros.items)) siteData.parceiros.items = [];
+        
+        // Fase 1: Conteudos (Textos, FAQ, Processo)
+        if (!siteData.texts) siteData.texts = {};
+        if (!siteData.processo) siteData.processo = { items: [] };
+        if (!siteData.faq) siteData.faq = { items: [] };
 
         if (!siteData.cta) siteData.cta = {};
 
@@ -109,6 +114,10 @@ function renderSidebar() {
             </button>
             <button class="nav-item" data-target="hero" onclick="activatePanel('hero')">
                 ${iconImage()} Hero
+            </button>
+            <button class="nav-item" data-target="conteudo" onclick="activatePanel('conteudo')">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> 
+                Conteúdo da Pág.
             </button>
             <button class="nav-item" data-target="config" onclick="activatePanel('config')">
                 ${iconSettings()} Configurações
@@ -170,6 +179,7 @@ function buildPanels() {
 
     buildGeralPanel(container);
     buildHeroPanel(container);
+    buildConteudoPanel(container);
     buildConfigPanel(container);
 
     const order = siteData.sectionOrder || Object.keys(siteData.sections);
@@ -322,11 +332,10 @@ function buildAmbientePanel(container, secId) {
 function buildImgCard(secId, imgObj, idx) {
     const src = typeof imgObj === 'string' ? imgObj : imgObj.src;
     const cap = typeof imgObj === 'object' ? (imgObj.caption || '') : '';
-    const pos = typeof imgObj === 'object' ? (imgObj.position || 'center center') : 'center center';
-
-    const posOptions = POSITION_OPTIONS.map(o =>
-        `<option value="${o.value}" ${pos === o.value ? 'selected' : ''}>${o.label}</option>`
-    ).join('');
+    // Retro-compatibility to 'position'
+    const legacyPos = typeof imgObj === 'object' ? (imgObj.position || 'center center') : 'center center';
+    const posDesk = typeof imgObj === 'object' ? (imgObj.positionDesktop || legacyPos) : 'center center';
+    const posMob = typeof imgObj === 'object' ? (imgObj.positionMobile || legacyPos) : 'center center';
 
     return `
         <div class="img-card" draggable="true" data-idx="${idx}" data-section="${secId}">
@@ -336,9 +345,9 @@ function buildImgCard(secId, imgObj, idx) {
             <div class="img-card-meta">
                 <input type="text" placeholder="Legenda..." value="${escHtml(cap)}"
                     onchange="updateImageField('${secId}', ${idx}, 'caption', this.value)">
-                <select onchange="updateImageField('${secId}', ${idx}, 'position', this.value)" title="Enquadramento Mobile">
-                    ${posOptions}
-                </select>
+                <button onclick="openCropModal('${secId}', ${idx}, '${posDesk}', '${posMob}')" style="font-size:0.75rem; padding:4px; margin-top:5px; border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Enquadramento Mobile e Desktop">
+                    📸 Foco / Enquadrar
+                </button>
             </div>
         </div>
     `;
@@ -395,6 +404,94 @@ function buildItemRow(secId, item, idx) {
             <button class="btn btn-sm btn-danger" onclick="deleteItem('${secId}', ${idx})">✕</button>
         </div>
     `;
+}
+
+// ── Panel: Conteúdo (Textos, FAQ, Processo)
+function buildConteudoPanel(container) {
+    const t = siteData.texts || {};
+    const faq = siteData.faq ? (siteData.faq.items || []) : [];
+    const proc = siteData.processo ? (siteData.processo.items || []) : [];
+
+    container.insertAdjacentHTML('beforeend', `
+        <div class="panel" id="panel-conteudo">
+            <div class="card">
+                <div class="card-header"><h3>Títulos das Seções & Textos Globais</h3></div>
+                
+                <div class="form-group">
+                    <label>Título: Materialidade (Ex: MATERIALIDADE)</label>
+                    <input type="text" id="inp-txt-materialidade" value="${escHtml(t.materialidadeTitle || 'MATERIALIDADE')}">
+                </div>
+                <div class="form-group">
+                    <label>Título: Parceiros (Ex: Parceiros)</label>
+                    <input type="text" id="inp-txt-parceiros" value="${escHtml(t.parceirosTitle || 'Parceiros')}">
+                </div>
+                <div class="form-group">
+                    <label>Título: FAQ (Ex: Perguntas Frequentes)</label>
+                    <input type="text" id="inp-txt-faq" value="${escHtml(t.faqTitle || 'Perguntas Frequentes')}">
+                </div>
+                <div class="form-group">
+                    <label>Texto Subtítulo (Entre Manifesto e Footer):</label>
+                    <input type="text" id="inp-txt-midcta" value="${escHtml(t.midCta || '17 anos criando ambientes únicos')}">
+                </div>
+            </div>
+
+            <!-- FAQ SECTION -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Perguntas Frequentes (FAQ)</h3>
+                    <button class="btn btn-sm" onclick="addFaqItem()">+ Adicionar Pergunta</button>
+                </div>
+                <div id="faq-list">
+                    ${faq.map((item, idx) => buildConfigItemRow('faq', item, idx)).join('')}
+                </div>
+            </div>
+
+            <!-- PROCESSO SECTION -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>O Nosso Processo (Etapas)</h3>
+                    <button class="btn btn-sm" onclick="addProcessoItem()">+ Adicionar Etapa</button>
+                </div>
+                <div class="form-group">
+                    <label>Título da Seção de Processo (Ex: O Nosso Processo)</label>
+                    <input type="text" id="inp-txt-processo" value="${escHtml(t.processoTitle || 'O Nosso Processo')}">
+                </div>
+                <div id="processo-list">
+                    ${proc.map((item, idx) => buildConfigItemRow('processo', item, idx)).join('')}
+                </div>
+            </div>
+        </div>
+    `);
+}
+
+// Custom Config Item Row for FAQ / Processo
+function buildConfigItemRow(type, item, idx) {
+    if (type === 'faq') {
+        return `
+            <div class="item-row is-faq" draggable="true" data-idx="${idx}" data-section="faq">
+                <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" placeholder="Pergunta" value="${escHtml(item.q || '')}" onchange="updateConfigItem('faq', ${idx}, 'q', this.value)">
+                    <textarea placeholder="Resposta" onchange="updateConfigItem('faq', ${idx}, 'a', this.value)" rows="3" style="width:100%; border:1px solid var(--border);border-radius:4px;padding:8px;">${escHtml(item.a || '')}</textarea>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteConfigItem('faq', ${idx})">✕</button>
+            </div>
+        `;
+    }
+    if (type === 'processo') {
+        return `
+            <div class="item-row is-processo" draggable="true" data-idx="${idx}" data-section="processo">
+                <div style="width:60px;">
+                    <input type="text" placeholder="01" value="${escHtml(item.num || '')}" onchange="updateConfigItem('processo', ${idx}, 'num', this.value)">
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" placeholder="Nome da Faze (ex: Escuta)" value="${escHtml(item.title || '')}" onchange="updateConfigItem('processo', ${idx}, 'title', this.value)">
+                    <textarea placeholder="Pequena descrição (Opcional)" onchange="updateConfigItem('processo', ${idx}, 'desc', this.value)" rows="2" style="width:100%; border:1px solid var(--border);border-radius:4px;padding:8px;">${escHtml(item.desc || '')}</textarea>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="deleteConfigItem('processo', ${idx})">✕</button>
+            </div>
+        `;
+    }
+    return '';
 }
 
 // ── Panel: Config (whatsapp, instagram, cta)
@@ -825,6 +922,76 @@ async function removeHeroBg() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// CROP MODAL VISUAL
+// ─────────────────────────────────────────────────────────────
+
+let cropState = { secId: '', idx: -1, desk: 'center center', mob: 'center center' };
+
+function openCropModal(secId, idx, deskPos, mobPos) {
+    cropState = { secId, idx, desk: deskPos, mob: mobPos };
+    
+    // Highlight UI Desk
+    document.querySelectorAll('#crop-grid-desk .crop-cell').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.pos === deskPos) el.classList.add('active');
+    });
+    document.getElementById('crop-val-desk').textContent = deskPos;
+
+    // Highlight UI Mob
+    document.querySelectorAll('#crop-grid-mob .crop-cell').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.pos === mobPos) el.classList.add('active');
+    });
+    document.getElementById('crop-val-mob').textContent = mobPos;
+
+    document.getElementById('crop-modal').classList.add('open');
+}
+
+function closeCropModal() {
+    document.getElementById('crop-modal').classList.remove('open');
+}
+
+async function confirmCrop() {
+    const { secId, idx, desk, mob } = cropState;
+    if (idx === -1) return;
+
+    const imgArr = siteData.sections[secId].images;
+    if (typeof imgArr[idx] === 'string') {
+        imgArr[idx] = { src: imgArr[idx], caption: '', positionDesktop: desk, positionMobile: mob };
+    } else {
+        imgArr[idx].positionDesktop = desk;
+        imgArr[idx].positionMobile = mob;
+    }
+
+    await saveContent(false);
+    rebuildCurrentPanel(secId);
+    closeCropModal();
+    showToast('Enquadramento salvo!', 'success');
+}
+
+// Bind cell click events (run once)
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('#crop-grid-desk .crop-cell').forEach(cell => {
+        cell.addEventListener('click', (e) => {
+            const pos = e.target.dataset.pos;
+            cropState.desk = pos;
+            document.querySelectorAll('#crop-grid-desk .crop-cell').forEach(el => el.classList.remove('active'));
+            e.target.classList.add('active');
+            document.getElementById('crop-val-desk').textContent = pos;
+        });
+    });
+    document.querySelectorAll('#crop-grid-mob .crop-cell').forEach(cell => {
+        cell.addEventListener('click', (e) => {
+            const pos = e.target.dataset.pos;
+            cropState.mob = pos;
+            document.querySelectorAll('#crop-grid-mob .crop-cell').forEach(el => el.classList.remove('active'));
+            e.target.classList.add('active');
+            document.getElementById('crop-val-mob').textContent = pos;
+        });
+    });
+});
+
+// ─────────────────────────────────────────────────────────────
 // SAVE
 // ─────────────────────────────────────────────────────────────
 
@@ -879,6 +1046,20 @@ async function saveContent(showMsg = true) {
     const ctaH = document.getElementById('inp-cta-headline');
     if (ctaH) siteData.cta.headline = ctaH.value;
 
+    // Conteudos fields (Texts)
+    if (!siteData.texts) siteData.texts = {};
+    const tFields = [
+        {id: 'inp-txt-materialidade', key: 'materialidadeTitle'},
+        {id: 'inp-txt-parceiros', key: 'parceirosTitle'},
+        {id: 'inp-txt-faq', key: 'faqTitle'},
+        {id: 'inp-txt-processo', key: 'processoTitle'},
+        {id: 'inp-txt-midcta', key: 'midCta'}
+    ];
+    tFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        if (el) siteData.texts[f.key] = el.value;
+    });
+
     try {
         const res = await fetch('/api/content', {
             method: 'POST',
@@ -891,6 +1072,43 @@ async function saveContent(showMsg = true) {
     } catch (err) {
         updateSaveStatus('error');
         showToast('Erro ao salvar', 'error');
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONTEUDO ACTIONS (FAQ & Processo)
+// ─────────────────────────────────────────────────────────────
+
+async function addFaqItem() {
+    if (!siteData.faq) siteData.faq = { items: [] };
+    if (!siteData.faq.items) siteData.faq.items = [];
+    siteData.faq.items.push({ q: 'Nova Pergunta', a: 'Resposta...' });
+    await saveContent(false);
+    rebuildCurrentPanel('conteudo');
+}
+
+async function addProcessoItem() {
+    if (!siteData.processo) siteData.processo = { items: [] };
+    if (!siteData.processo.items) siteData.processo.items = [];
+    siteData.processo.items.push({ num: '0' + (siteData.processo.items.length + 1), title: 'Nova Etapa', desc: '' });
+    await saveContent(false);
+    rebuildCurrentPanel('conteudo');
+}
+
+async function updateConfigItem(section, index, field, value) {
+    if (siteData[section] && siteData[section].items && siteData[section].items[index]) {
+        siteData[section].items[index][field] = value;
+        await saveContent(false);
+    }
+}
+
+async function deleteConfigItem(section, index) {
+    if (!confirm('Remover este item?')) return;
+    if (siteData[section] && siteData[section].items) {
+        siteData[section].items.splice(index, 1);
+        await saveContent(false);
+        rebuildCurrentPanel('conteudo');
+        showToast('Item removido', 'info');
     }
 }
 
