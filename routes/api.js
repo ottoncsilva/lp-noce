@@ -7,72 +7,86 @@ const sharp = require('sharp');
 const basicAuth = require('express-basic-auth');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
-const IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
+const IMAGES_DIR   = path.join(__dirname, '..', 'public', 'images');
 
-// Ensure image directories exist
-const sections = ['cozinha', 'living', 'closet', 'banheiro', 'corporativo', 'acabamentos', 'parceiros'];
-sections.forEach(sec => {
-    const dir = path.join(IMAGES_DIR, sec);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-});
+// Ensure base images dir exists
+if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true });
 
-// Setup Multer (memory storage for Sharp processing)
-const storage = multer.memoryStorage();
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
-});
-
-// Auth Middleware for protected routes
+// Auth middleware
 const adminUsers = {};
 adminUsers[process.env.ADMIN_USER] = process.env.ADMIN_PASS;
 const protect = basicAuth({ users: adminUsers, challenge: true });
 
-// --- PUBLIC ROUTES ---
+// Multer — memory storage for Sharp
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 15 * 1024 * 1024 } // 15 MB
+});
 
-// GET /api/content - Fetch site content (Public)
+// ─── Helpers ────────────────────────────────────────────────
+
+/** Sanitize a section/category ID: alphanumeric + dash/underscore only */
+function sanitizeSectionId(id) {
+    return id.replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 64);
+}
+
+/** Ensure the upload dir for a section exists */
+function ensureSectionDir(secId) {
+    const dir = path.join(IMAGES_DIR, secId);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    return dir;
+}
+
+// ─── PUBLIC ROUTES ───────────────────────────────────────────
+
+// GET /api/content — site content (public)
 router.get('/content', (req, res) => {
     try {
+        if (!fs.existsSync(CONTENT_FILE)) {
+            return res.json({});
+        }
         const data = fs.readFileSync(CONTENT_FILE, 'utf8');
         res.json(JSON.parse(data));
     } catch (err) {
+        console.error('GET /content error:', err);
         res.status(500).json({ error: 'Erro ao carregar conteúdo' });
     }
 });
 
-// --- PROTECTED ROUTES ---
+// ─── PROTECTED ROUTES ────────────────────────────────────────
 
-// POST /api/content - Update site content
+// POST /api/content — save site content
 router.post('/content', protect, (req, res) => {
     try {
         const newContent = req.body;
+        // Ensure data dir exists
+        const dataDir = path.join(__dirname, '..', 'data');
+        if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+
         fs.writeFileSync(CONTENT_FILE, JSON.stringify(newContent, null, 2), 'utf8');
-        res.json({ success: true, message: 'Conteúdo atualizado' });
+        res.json({ success: true });
     } catch (err) {
+        console.error('POST /content error:', err);
         res.status(500).json({ error: 'Erro ao salvar conteúdo' });
     }
 });
 
-// POST /api/upload/:section - Upload Images
-router.post('/upload/:section', protect, upload.array('photos', 20), async (req, res) => {
+// POST /api/upload/:section — upload images (any valid section id)
+router.post('/upload/:section', protect, upload.array('photos', 30), async (req, res) => {
     try {
-        const section = req.params.section;
-        if (!sections.includes(section)) {
-            return res.status(400).json({ error: 'Sessão inválida' });
-        }
+        const section = sanitizeSectionId(req.params.section);
+        if (!section) return res.status(400).json({ error: 'ID de seção inválido' });
 
+        const dir = ensureSectionDir(section);
         const uploadedFiles = [];
 
         for (const file of req.files) {
-            const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}.jpg`;
-            const filepath = path.join(IMAGES_DIR, section, filename);
+            const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
+            const filepath = path.join(dir, filename);
 
-            // Compress and convert to JPG using Sharp
             await sharp(file.buffer)
                 .resize({ width: 1920, withoutEnlargement: true })
-                .jpeg({ quality: 80, progressive: true })
+                .jpeg({ quality: 82, progressive: true })
                 .toFile(filepath);
 
             uploadedFiles.push(`/images/${section}/${filename}`);
@@ -80,25 +94,29 @@ router.post('/upload/:section', protect, upload.array('photos', 20), async (req,
 
         res.json({ success: true, files: uploadedFiles });
     } catch (err) {
-        console.error(err);
+        console.error('POST /upload error:', err);
         res.status(500).json({ error: 'Erro no upload' });
     }
 });
 
-// DELETE /api/upload - Delete an image
+// DELETE /api/upload — delete a single image file
 router.delete('/upload', protect, (req, res) => {
     try {
-        const { imagePath } = req.body; // e.g., "/images/cozinha/123.jpg"
+        const { imagePath } = req.body;
         if (!imagePath || !imagePath.startsWith('/images/')) {
             return res.status(400).json({ error: 'Caminho inválido' });
         }
 
-        const absolutePath = path.join(__dirname, '..', 'public', imagePath);
-        if (fs.existsSync(absolutePath)) {
-            fs.unlinkSync(absolutePath);
-        }
+        // Extra safety: no path traversal
+        const relative = imagePath.replace(/^\/images\//, '');
+        if (relative.includes('..')) return res.status(400).json({ error: 'Caminho inválido' });
+
+        const absolutePath = path.join(IMAGES_DIR, relative);
+        if (fs.existsSync(absolutePath)) fs.unlinkSync(absolutePath);
+
         res.json({ success: true });
     } catch (err) {
+        console.error('DELETE /upload error:', err);
         res.status(500).json({ error: 'Erro ao apagar' });
     }
 });

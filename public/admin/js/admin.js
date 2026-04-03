@@ -33,30 +33,61 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function fetchContent() {
     try {
         const res = await fetch('/api/content');
-        if (!res.ok) throw new Error('Network error');
-        siteData = await res.json();
+        if (!res.ok) throw new Error('Network error ' + res.status);
+        const raw = await res.json();
 
-        // Garante estrutura sections
+        // Aceita tanto objeto vazio quanto dados existentes
+        siteData = raw || {};
+
+        // Garante sections
         if (!siteData.sections) siteData.sections = {};
 
-        // Garante que cada seção padrão existe
+        // Normaliza cada section padrão — insere se não existir, garante .label
         DEFAULT_SECTIONS.forEach(s => {
             if (!siteData.sections[s]) {
                 siteData.sections[s] = { label: capitalize(s), headline: '', images: [] };
+            } else if (!siteData.sections[s].label) {
+                // Dados antigos sem .label — inferir pelo ID
+                siteData.sections[s].label = capitalize(s);
             }
         });
 
-        // Garante section customizada — mantém categorias extras
-        if (!siteData.sectionOrder) {
+        // Normaliza categorias extras que já existem no JSON
+        Object.keys(siteData.sections).forEach(secId => {
+            if (!siteData.sections[secId].label) {
+                siteData.sections[secId].label = capitalize(secId);
+            }
+            if (!siteData.sections[secId].images) {
+                siteData.sections[secId].images = [];
+            }
+        });
+
+        // Garante sectionOrder
+        if (!siteData.sectionOrder || !Array.isArray(siteData.sectionOrder) || siteData.sectionOrder.length === 0) {
             siteData.sectionOrder = Object.keys(siteData.sections);
         }
 
+        // Garante acabamentos e parceiros no nível raiz
         if (!siteData.acabamentos) siteData.acabamentos = { headline: '', items: [] };
+        if (!Array.isArray(siteData.acabamentos.items)) siteData.acabamentos.items = [];
         if (!siteData.parceiros)   siteData.parceiros   = { headline: '', items: [] };
-        if (!siteData.cta)         siteData.cta         = {};
+        if (!Array.isArray(siteData.parceiros.items)) siteData.parceiros.items = [];
+
+        if (!siteData.cta) siteData.cta = {};
 
     } catch(err) {
-        showToast("Erro ao carregar dados", "error");
+        console.warn('fetchContent error:', err);
+        showToast('Erro ao carregar dados — usando estrutura padrão', 'error');
+
+        // Inicializa estrutura mínima para não quebrar a UI
+        if (!siteData.sections) siteData.sections = {};
+        DEFAULT_SECTIONS.forEach(s => {
+            if (!siteData.sections[s]) siteData.sections[s] = { label: capitalize(s), headline: '', images: [] };
+        });
+        if (!siteData.sectionOrder) siteData.sectionOrder = [...DEFAULT_SECTIONS];
+        if (!siteData.acabamentos)  siteData.acabamentos = { headline: '', items: [] };
+        if (!siteData.parceiros)    siteData.parceiros = { headline: '', items: [] };
+        if (!siteData.cta)          siteData.cta = {};
     }
 }
 
@@ -65,60 +96,59 @@ async function fetchContent() {
 // ─────────────────────────────────────────────────────────────
 
 function renderSidebar() {
-    const nav = document.getElementById('sidebar-nav');
-    const order = siteData.sectionOrder || Object.keys(siteData.sections);
+    try {
+        const nav = document.getElementById('sidebar-nav');
+        const order = (siteData.sectionOrder && siteData.sectionOrder.length > 0)
+            ? siteData.sectionOrder
+            : Object.keys(siteData.sections || {});
 
-    nav.innerHTML = `
-        <div class="nav-section-title">Configuração</div>
-        <button class="nav-item" data-target="geral" onclick="activatePanel('geral')">
-            ${iconGear()}
-            Geral
-        </button>
-        <button class="nav-item" data-target="hero" onclick="activatePanel('hero')">
-            ${iconImage()}
-            Hero
-        </button>
-        <button class="nav-item" data-target="config" onclick="activatePanel('config')">
-            ${iconSettings()}
-            Configurações
-        </button>
-
-        <div class="nav-section-title" style="margin-top:0.5rem;">Ambientes</div>
-        <div class="nav-group ${order.some(s => siteData.sections[s]) ? 'open' : 'open'}" id="nav-group-ambientes">
-            <button class="nav-group-toggle" onclick="toggleNavGroup('nav-group-ambientes')">
-                <span class="toggle-left">
-                    ${iconRooms()}
-                    Ambientes
-                </span>
-                <span style="display:flex;align-items:center;gap:6px;">
-                    <button class="btn-add-cat" onclick="openNewCategoryModal(event)" title="Nova categoria">+</button>
-                    ${iconChevron()}
-                </span>
+        nav.innerHTML = `
+            <div class="nav-section-title">Configuração</div>
+            <button class="nav-item" data-target="geral" onclick="activatePanel('geral')">
+                ${iconGear()} Geral
             </button>
-            <div class="nav-submenu" id="submenu-ambientes">
-                ${order.map(secId => {
-                    if (!siteData.sections[secId]) return '';
-                    const label = siteData.sections[secId].label || capitalize(secId);
-                    return `
-                        <button class="nav-sub-item" data-target="${secId}" onclick="activatePanel('${secId}')">
-                            ${iconRoom()}
-                            ${escHtml(label)}
-                        </button>
-                    `;
-                }).join('')}
-            </div>
-        </div>
+            <button class="nav-item" data-target="hero" onclick="activatePanel('hero')">
+                ${iconImage()} Hero
+            </button>
+            <button class="nav-item" data-target="config" onclick="activatePanel('config')">
+                ${iconSettings()} Configurações
+            </button>
 
-        <div class="nav-section-title" style="margin-top:0.5rem;">Catálogo</div>
-        <button class="nav-item" data-target="acabamentos" onclick="activatePanel('acabamentos')">
-            ${iconPalette()}
-            Acabamentos
-        </button>
-        <button class="nav-item" data-target="parceiros" onclick="activatePanel('parceiros')">
-            ${iconPartners()}
-            Parceiros
-        </button>
-    `;
+            <div class="nav-section-title" style="margin-top:0.5rem;">Ambientes</div>
+            <div class="nav-group open" id="nav-group-ambientes">
+                <button class="nav-group-toggle" onclick="toggleNavGroup('nav-group-ambientes')">
+                    <span class="toggle-left">${iconRooms()} Ambientes</span>
+                    <span style="display:flex;align-items:center;gap:6px;">
+                        <button class="btn-add-cat" onclick="openNewCategoryModal(event)" title="Nova categoria">+</button>
+                        ${iconChevron()}
+                    </span>
+                </button>
+                <div class="nav-submenu" id="submenu-ambientes">
+                    ${order.map(secId => {
+                        if (!siteData.sections || !siteData.sections[secId]) return '';
+                        const lbl = siteData.sections[secId].label || capitalize(secId);
+                        return `<button class="nav-sub-item" data-target="${secId}" onclick="activatePanel('${secId}')">${iconRoom()} ${escHtml(lbl)}</button>`;
+                    }).join('')}
+                </div>
+            </div>
+
+            <div class="nav-section-title" style="margin-top:0.5rem;">Catálogo</div>
+            <button class="nav-item" data-target="acabamentos" onclick="activatePanel('acabamentos')">
+                ${iconPalette()} Acabamentos
+            </button>
+            <button class="nav-item" data-target="parceiros" onclick="activatePanel('parceiros')">
+                ${iconPartners()} Parceiros
+            </button>
+        `;
+    } catch(err) {
+        console.error('renderSidebar error:', err);
+        // Fallback mínimo
+        const nav = document.getElementById('sidebar-nav');
+        if (nav) nav.innerHTML = `
+            <div class="nav-section-title">Navegação</div>
+            <button class="nav-item active" onclick="activatePanel('geral')" data-target="geral">${iconGear()} Geral</button>
+        `;
+    }
 }
 
 function toggleNavGroup(id) {
