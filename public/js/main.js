@@ -27,11 +27,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         const logoUrl = data.logo || '/images/placeholder.jpg';
         document.querySelectorAll('.main-logo-img').forEach(el => el.src = logoUrl);
 
-        // Hero background (dynamic from admin)
-        if(data.heroBg) {
-            document.querySelector('.hero-bg').style.backgroundImage = `url('${data.heroBg}')`;
+        // Hero background color (admin-controlled)
+        const heroBgEl = document.querySelector('.hero-bg');
+        if(data.heroBgColor) {
+            document.querySelector('.hero').style.backgroundColor = data.heroBgColor;
         }
-        document.querySelector('.hero-tagline').textContent = data.tagline || '';
+        // Hero background image
+        if(data.heroBg && heroBgEl) {
+            heroBgEl.style.backgroundImage = `url('${data.heroBg}')`;
+        }
+        const taglineEl = document.querySelector('.hero-tagline');
+        if(taglineEl) taglineEl.textContent = data.tagline || '';
 
         // Manifesto — SAFE split (no crash if "não" missing)
         if(data.manifesto && data.manifesto.headline) {
@@ -48,31 +54,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         const mBody = document.querySelector('.m-body');
         if(mBody && data.manifesto) mBody.textContent = data.manifesto.body || '';
 
-        // Ambientes (Horizontal Scroll)
+        // Ambientes (Horizontal Scroll) — respei­ta sectionOrder dinâmico
         const ambContainer = document.getElementById('ambientes-container');
-        const sections = ['cozinha', 'living', 'closet', 'banheiro', 'corporativo'];
-        
-        sections.forEach(secName => {
+        const sectionOrder = data.sectionOrder || (data.sections ? Object.keys(data.sections) : []);
+
+        sectionOrder.forEach(secName => {
             const secData = data.sections ? data.sections[secName] : null;
             if(!secData) return;
-            
+
             const html = `
                 <section class="section ambiente-pin-wrap" id="sec-${secName}">
                     <div class="ambiente-entry">
-                        <h2 class="ambiente-word">${secData.label}</h2>
+                        <h2 class="ambiente-word">${secData.label || secName}</h2>
                     </div>
                     <div class="swipe-icon-container">
                         <span class="swipe-text">Deslize</span>
                         <svg class="swipe-hand" viewBox="0 0 24 24"><path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.21 0-.62-.35-1.18-.91-1.42z"/></svg>
                     </div>
                     <div class="ambiente-track">
-                        ${secData.images && secData.images.length > 0 
+                        ${secData.images && secData.images.length > 0
                             ? secData.images.map(img => {
                                 const imgSrc = typeof img === 'string' ? img : img.src;
                                 const imgCap = typeof img === 'object' && img.caption ? img.caption : '';
+                                const imgPos = typeof img === 'object' && img.position ? img.position : 'center center';
                                 return `
                                 <div class="gallery-item">
-                                    <img src="${imgSrc}" alt="${secData.label} - Noce Mobili" loading="lazy" width="1920" height="1080">
+                                    <img src="${imgSrc}" alt="${secData.label || secName} - Noce Mobili" loading="lazy"
+                                        style="object-position: ${imgPos};" width="1920" height="1080">
                                     ${imgCap ? `<div class="micro-caption">${imgCap}</div>` : ''}
                                     <div class="gallery-sweep-line"></div>
                                 </div>

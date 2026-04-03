@@ -50,27 +50,33 @@
 
     /* Native Horizontal Scrolling para mobile */
     .ambiente-pin-wrap {
-        height: auto; /* Deixa esticar o quanto for */
-        min-height: 100vh;
+        height: auto;
+        min-height: 65vh; /* Reduzido: mostra mais largura de cada foto */
         align-items: center;
     }
     .ambiente-track {
-        height: 100vh;
+        height: 65vh; /* Menos corte vertical nas fotos paisagem */
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         padding-left: 0;
-        width: 100vw; /* Força caber dentro do viewport nativo */
+        width: 100vw;
         display: flex;
+        -webkit-overflow-scrolling: touch;
     }
     .gallery-item {
         scroll-snap-align: center;
+        height: 65vh;
+    }
+    /* object-position é controlado via style inline pelo admin */
+    .gallery-item img {
+        object-position: center center; /* fallback; sobrescrito por inline style */
     }
 
     /* Ajuste para as novas legendas não sumirem */
     .gallery-item .micro-caption {
-        bottom: 2rem;
-        right: 1.5rem;
-        left: 1.5rem; /* Ocupa a base do celular centralizada */
+        bottom: 1.5rem;
+        right: 1rem;
+        left: 1rem;
         width: auto;
         text-align: center;
     }
