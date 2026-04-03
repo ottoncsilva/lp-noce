@@ -78,6 +78,16 @@ async function fetchContent() {
         if (!siteData.processo) siteData.processo = { items: [] };
         if (!siteData.faq) siteData.faq = { items: [] };
 
+        // Preenche FAQs padrão se ainda não existirem
+        if (siteData.faq.items.length === 0) {
+            siteData.faq.items = [
+                { q: 'Quanto custa um projeto de móveis planejados?', a: 'Cada projeto é único e o investimento depende da complexidade, dos materiais escolhidos e do escopo. Oferecemos consultoria gratuita para entender suas necessidades e apresentar um orçamento personalizado.' },
+                { q: 'Qual é o prazo de entrega?', a: 'O prazo varia de acordo com o projeto, geralmente entre 45 e 90 dias após a aprovação do projeto executivo. Trabalhamos com cronograma transparente do início ao fim.' },
+                { q: 'Vocês atendem em qual região?', a: 'Atendemos toda a Grande São Paulo e região metropolitana. Para outros estados, consulte nossa equipe.' },
+                { q: 'Como funciona a consultoria?', a: 'Tudo começa com uma conversa para entender seu estilo, necessidades e orçamento. Em seguida, nossa equipe cria um projeto exclusivo com curadoria de materiais e acompanhamento completo até a entrega.' }
+            ];
+        }
+
         if (!siteData.cta) siteData.cta = {};
 
     } catch(err) {
@@ -944,6 +954,8 @@ function posToPercent(posStr) {
     return { x, y };
 }
 
+let _dragListenersSetup = false;
+
 function openCropModal(secId, idx, deskPos, mobPos) {
     if(!deskPos || deskPos === 'center center') deskPos = '50% 50%';
     if(!mobPos || mobPos === 'center center') mobPos = '50% 50%';
@@ -971,6 +983,15 @@ function openCropModal(secId, idx, deskPos, mobPos) {
     mobImg.dataset.y = posToPercent(mobPos).y;
 
     document.getElementById('crop-modal').classList.add('open');
+    
+    // Setup drag apenas uma vez (após o modal estar visível e ter dimensões)
+    if (!_dragListenersSetup) {
+        _dragListenersSetup = true;
+        requestAnimationFrame(() => {
+            setupDragPan('cp-container-desk', 'cp-img-desk', 'desk');
+            setupDragPan('cp-container-mob', 'cp-img-mob', 'mob');
+        });
+    }
 }
 
 function closeCropModal() {
@@ -1063,11 +1084,7 @@ function setupDragPan(containerId, imgId, stateKey) {
     container.addEventListener('touchend', stopHandler);
 }
 
-// Bind drag logic
-document.addEventListener("DOMContentLoaded", () => {
-    setupDragPan('cp-container-desk', 'cp-img-desk', 'desk');
-    setupDragPan('cp-container-mob', 'cp-img-mob', 'mob');
-});
+// Drag setup é feito em openCropModal via requestAnimationFrame
 
 // ─────────────────────────────────────────────────────────────
 // SAVE
