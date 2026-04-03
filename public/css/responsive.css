@@ -18,11 +18,14 @@
     /* Processo */
     .proc-steps {
         flex-direction: column;
-        gap: 2rem;
+        align-items: center;
+        gap: 2.5rem;
+        padding: 0;
     }
+    .step { max-width: 260px; width: 100%; }
     .proc-linha-progresso {
         top: 10vh;
-        left: 50vw;
+        left: 50%;
         width: 1px;
         height: 60vh;
         transform: translateX(-50%);
@@ -97,8 +100,8 @@
 
     /* Parceiros Fix Spacing */
     .parceiros-title { top: 5vh; font-size: clamp(2rem, 8vw, 3rem); }
-    .parceiros-spotlight { padding-top: 10vh; padding-bottom: 15vh; }
-    .parc-logo { margin: 8vh 0; width: 140px; }
+    .parceiros-spotlight { padding-top: 8vh; padding-bottom: 10vh; }
+    .parc-logo { margin: 5vh 0; width: 140px; }
 
     /* Materialidade Fix (Remove absolute positioning chaos on mobile) */
     .acabamentos-wrapper {
@@ -161,4 +164,25 @@
     30% { opacity: 1; }
     70% { opacity: 1; }
     100% { transform: translateX(-20px) rotate(-5deg); opacity: 0; }
+}
+
+/* ── TABLET (769px–1024px) ───────────────────────────────────── */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    /* Swatches menores para caber sem overflow em telas médias */
+    .swatch { width: 200px; height: 300px; }
+
+    /* Botões do contato em coluna em tablet */
+    .cta-btns {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    .btn-outline { text-align: center; }
+
+    /* Parceiros: logos um pouco menores */
+    .parc-logo { width: 160px; margin: 5vh 0; }
+
+    /* Processo: steps com mais espaço */
+    .proc-steps { gap: 0.5rem; }
+    .step { max-width: 130px; }
 }

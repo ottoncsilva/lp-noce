@@ -120,7 +120,7 @@ html.lenis { height: auto; }
 /* SECTIONS */
 .section {
     position: relative;
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
     overflow: hidden;
 }
@@ -166,8 +166,10 @@ html.lenis { height: auto; }
     letter-spacing: 0.25em;
     text-transform: uppercase;
     margin-top: 1rem;
-    padding: 0 10vw;
+    padding: 0 6vw;
     line-height: 1.6;
+    text-align: center;
+    max-width: 700px;
 }
 
 /* MANIFESTO */
@@ -349,12 +351,20 @@ html.lenis { height: auto; }
     background: var(--noce-green);
     color: var(--noce-white);
     display: flex; flex-direction: column; justify-content: center;
+    position: relative;
+    padding: 0 5vw 4rem;
 }
 .proc-head { text-align: center; margin-bottom: 4rem; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em;}
-.proc-steps { display: flex; justify-content: space-around; position: relative; z-index: 2;}
-.step { text-align: center; }
-.step-num { 
-    font-size: 2rem; width: 60px; height: 60px; 
+.proc-steps {
+    display: flex; justify-content: space-around; align-items: flex-start;
+    position: relative; z-index: 2;
+    padding: 0 2vw;
+    gap: 1rem;
+}
+.step { text-align: center; flex: 1; max-width: 160px; }
+.step p { word-break: break-word; }
+.step-num {
+    font-size: 2rem; width: 60px; height: 60px;
     border: 1px solid var(--noce-white); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 1rem; background: var(--noce-green);
@@ -380,10 +390,10 @@ html.lenis { height: auto; }
 }
 .parceiros-spotlight {
     display: flex; flex-direction: column; align-items: center;
-    padding-top: 50vh; padding-bottom: 50vh;
+    padding-top: 20vh; padding-bottom: 20vh;
 }
 .parc-logo {
-    width: 200px; max-width: 40vw; height: auto; margin: 15vh 0;
+    width: 200px; max-width: 40vw; height: auto; margin: 6vh 0;
     opacity: 0.2; filter: grayscale(100%);
     transition: all 0.5s;
 }
@@ -409,7 +419,7 @@ html.lenis { height: auto; }
     padding: 1.5rem 3rem; border: 1px solid var(--noce-white);
     color: var(--noce-white); letter-spacing: 0.25em; text-transform: uppercase; font-size: 12px;
 }
-.minimal-footer { position: absolute; bottom: 2rem; font-size: 10px; color: rgba(255,255,255,0.4); }
+.minimal-footer { position: relative; margin-top: 4rem; font-size: 10px; color: rgba(255,255,255,0.4); }
 
 /* === ACCESSIBILITY: Skip Link === */
 .skip-link {
@@ -445,6 +455,9 @@ html.lenis { height: auto; }
     color: var(--noce-gray);
     letter-spacing: 0.1em;
     margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .cta-mid-btn {
     display: inline-block;
