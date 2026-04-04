@@ -178,21 +178,21 @@ html.lenis { height: auto; }
     justify-content: center; align-items: center;
     background: var(--noce-white);
     color: var(--noce-black);
-    padding: 10vh 5vw; /* Adds breathable space around */
+    padding: 6vh 5vw; /* Adds breathable space around */
 }
-.manifesto-wrap { 
-    display: flex; 
-    gap: 1.5vw; 
-    overflow: hidden; 
-    margin-bottom: 4rem; 
-    align-items: center; 
+.manifesto-wrap {
+    display: flex;
+    gap: 0.3vw;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    align-items: center;
     justify-content: center;
 }
 .manifesto-wrap h2 {
-    font-weight: 300; 
+    font-weight: 300;
     font-size: clamp(2.5rem, 6vw, 5.5rem);
     white-space: nowrap;
-    padding: 0 2vw;
+    padding: 0 0.5vw;
 }
 .manifesto-body {
     width: 100%;
@@ -318,7 +318,7 @@ html.lenis { height: auto; }
     text-align: center; font-size: clamp(2rem, 6vw, 4rem);
     font-weight: 100; color: var(--noce-black);
     letter-spacing: 0.05em;
-    margin-bottom: 10vh;
+    margin-bottom: 4rem;
 }
 .acabamentos-wrapper {
     position: relative;
@@ -352,7 +352,7 @@ html.lenis { height: auto; }
     color: var(--noce-white);
     display: flex; flex-direction: column; justify-content: center;
     position: relative;
-    padding: 0 5vw 4rem;
+    padding: 6vh 0 4rem;
 }
 .proc-head { text-align: center; margin-bottom: 4rem; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em;}
 .proc-steps {
@@ -389,11 +389,17 @@ html.lenis { height: auto; }
     padding: 0 5vw;
 }
 .parceiros-spotlight {
-    display: flex; flex-direction: column; align-items: center;
-    padding-top: 10vh; padding-bottom: 10vh;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4vw;
+    padding-top: 8vh;
+    padding-bottom: 8vh;
 }
 .parc-logo {
-    width: 200px; max-width: 40vw; height: auto; margin: 3vh 0;
+    width: 140px; max-width: 18vw; height: auto; margin: 1.5vh 0;
     opacity: 0.2; filter: grayscale(100%);
     transition: all 0.5s;
 }
@@ -413,7 +419,7 @@ html.lenis { height: auto; }
     align-items: center; justify-content: center;
     color: var(--noce-white); text-align: center;
 }
-.cta-headline { font-size: clamp(2rem, 5vw, 4rem); font-weight: 100; letter-spacing: 0.05em; margin-bottom: 3rem;}
+.cta-headline { font-size: clamp(2rem, 5vw, 4rem); font-weight: 100; letter-spacing: 0.05em; margin-bottom: 4rem;}
 .cta-btns { display: flex; gap: 2rem; }
 .btn-outline {
     padding: 1.5rem 3rem; border: 1px solid var(--noce-white);

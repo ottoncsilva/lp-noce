@@ -127,7 +127,7 @@ function renderSidebar() {
         nav.innerHTML = `
             <div class="nav-section-title">Configuração</div>
             <button class="nav-item" data-target="geral" onclick="activatePanel('geral')">
-                ${iconGear()} Geral
+                ${iconGear()} Identidade
             </button>
             <button class="nav-item" data-target="hero" onclick="activatePanel('hero')">
                 ${iconImage()} Hero
@@ -137,7 +137,7 @@ function renderSidebar() {
                 Conteúdo da Pág.
             </button>
             <button class="nav-item" data-target="config" onclick="activatePanel('config')">
-                ${iconSettings()} Configurações
+                ${iconSettings()} Contato
             </button>
 
             <div class="nav-section-title" style="margin-top:0.5rem;">Ambientes</div>
@@ -210,7 +210,7 @@ function buildPanels() {
     buildListPanel(container, 'parceiros', siteData.parceiros);
 }
 
-// ── Panel: Geral (textos manifesto + logotipo)
+// ── Panel: Identidade (logotipo apenas)
 function buildGeralPanel(container) {
     container.insertAdjacentHTML('beforeend', `
         <div class="panel" id="panel-geral">
@@ -226,22 +226,6 @@ function buildGeralPanel(container) {
                     <input type="file" id="file-logo" accept="image/*" style="display:none" onchange="uploadLogoGlobal(event)">
                     <button class="btn btn-sm" onclick="document.getElementById('file-logo').click()">Upload Logo</button>
                     ${siteData.logo ? `<button class="btn btn-sm btn-danger" onclick="removeLogoGlobal()">Remover</button>` : ''}
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><h3>Textos Manifesto</h3></div>
-                <div class="form-group">
-                    <label>Tagline (aparece no Hero)</label>
-                    <input type="text" id="inp-tagline" value="${escHtml(siteData.tagline || '')}">
-                </div>
-                <div class="form-group">
-                    <label>Manifesto — Título</label>
-                    <input type="text" id="inp-man-head" value="${escHtml(siteData.manifesto ? siteData.manifesto.headline : '')}">
-                </div>
-                <div class="form-group">
-                    <label>Manifesto — Corpo</label>
-                    <textarea id="inp-man-body">${escHtml(siteData.manifesto ? siteData.manifesto.body : '')}</textarea>
                 </div>
             </div>
         </div>
@@ -432,8 +416,27 @@ function buildConteudoPanel(container) {
     container.insertAdjacentHTML('beforeend', `
         <div class="panel" id="panel-conteudo">
             <div class="card">
-                <div class="card-header"><h3>Títulos das Seções & Textos Globais</h3></div>
-                
+                <div class="card-header"><h3>Manifesto & Textos Principais</h3></div>
+                <div class="form-group">
+                    <label>Tagline (aparece no Hero)</label>
+                    <input type="text" id="inp-tagline" value="${escHtml(siteData.tagline || '')}">
+                </div>
+                <div class="form-group">
+                    <label>Manifesto — Título</label>
+                    <input type="text" id="inp-man-head" value="${escHtml(siteData.manifesto ? siteData.manifesto.headline : '')}">
+                </div>
+                <div class="form-group">
+                    <label>Manifesto — Corpo</label>
+                    <textarea id="inp-man-body">${escHtml(siteData.manifesto ? siteData.manifesto.body : '')}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Frase principal do rodapé (CTA)</label>
+                    <input type="text" id="inp-cta-headline" value="${escHtml((siteData.cta || {}).headline || '')}">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>Títulos das Seções</h3></div>
                 <div class="form-group">
                     <label>Título: Materialidade (Ex: MATERIALIDADE)</label>
                     <input type="text" id="inp-txt-materialidade" value="${escHtml(t.materialidadeTitle || 'MATERIALIDADE')}">
@@ -525,13 +528,6 @@ function buildConfigPanel(container) {
                 <div class="form-group">
                     <label>@ do Instagram (sem o @)</label>
                     <input type="text" id="inp-instagram" value="${escHtml(cta.instagram || '')}">
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header"><h3>Call to Action</h3></div>
-                <div class="form-group">
-                    <label>Frase principal do rodapé</label>
-                    <input type="text" id="inp-cta-headline" value="${escHtml(cta.headline || '')}">
                 </div>
             </div>
         </div>
