@@ -15,20 +15,31 @@
 
     .cta-mid { padding: 3rem 2rem; }
 
-    /* Processo */
+    /* Processo — horizontal no mobile (scroll lateral suave) */
     .proc-steps {
-        flex-direction: column;
-        align-items: center;
-        gap: 2.5rem;
-        padding: 0;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 2rem;
+        padding: 0 4vw;
+        scroll-snap-type: x mandatory;
     }
-    .step { max-width: 260px; width: 100%; }
+    .step {
+        min-width: 130px;
+        max-width: 160px;
+        flex-shrink: 0;
+        scroll-snap-align: start;
+        width: auto;
+    }
     .proc-linha-progresso {
-        top: 10vh;
-        left: 50%;
-        width: 1px;
-        height: 60vh;
-        transform: translateX(-50%);
+        top: 30px;
+        left: 4vw;
+        width: calc(100% - 8vw);
+        height: 1px;
+        transform: none;
     }
 
     /* Contato CTA */
@@ -98,26 +109,19 @@
         text-align: center;
     }
 
-    /* Parceiros Fix Spacing */
+    /* Parceiros — horizontal no mobile */
     .parceiros-title { top: 5vh; font-size: clamp(2rem, 8vw, 3rem); }
-    .parceiros-spotlight { padding-top: 4vh; padding-bottom: 5vh; }
-    .parc-logo { margin: 2vh 0; width: 140px; }
+    .parceiros-spotlight { padding-top: 4vh; padding-bottom: 4vh; gap: 5vw; }
+    .parc-logo { width: 90px; max-width: 28vw; margin: 1vh 0; }
 
-    /* Materialidade Fix (Remove absolute positioning chaos on mobile) */
-    .acabamentos-sec {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow: hidden;
-    }
+    /* Materialidade — centralização simétrica no mobile */
     .acabamentos-wrapper {
         min-height: auto;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1.15rem;
-        padding: 0 0 4rem 0;
-        max-width: 92vw;
-        margin: 0 auto;
+        padding: 0 4vw 4rem;
+        width: 100%;
         overflow: visible;
     }
     .swatch {
