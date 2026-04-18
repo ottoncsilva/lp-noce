@@ -179,6 +179,7 @@ html.lenis { height: auto; }
     background: var(--noce-white);
     color: var(--noce-black);
     padding: 6vh 5vw; /* Adds breathable space around */
+    min-height: auto;
 }
 .manifesto-wrap {
     display: flex;
@@ -567,7 +568,18 @@ html.lenis { height: auto; }
     50% { transform: translateX(-10px); }
 }
 
+/* LIGHTBOX */
+.lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+    z-index: 10000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    cursor: zoom-out;
+}
+.lightbox.active { opacity: 1; pointer-events: auto; }
+.lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; }
+
 /* === PROCESSO — TYPOGRAPHY FIX === */
+
 .proc-title {
     font-weight: 100;
     font-size: clamp(1.5rem, 3vw, 2.5rem);

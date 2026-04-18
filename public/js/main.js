@@ -459,5 +459,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         gsap.to('.whatsapp-btn', {
             y: -6, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut"
         });
+
+        // 9. Lightbox for Gallery Items
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        
+        if (lightbox && lightboxImg) {
+            // Event delegation on body for gallery items
+            document.body.addEventListener('click', (e) => {
+                const galleryImg = e.target.closest('.gallery-item img');
+                if (galleryImg) {
+                    lightboxImg.src = galleryImg.src;
+                    lightbox.classList.add('active');
+                } else if (lightbox.classList.contains('active')) {
+                    // Clicou fora da imagem ou em qualquer lugar
+                    lightbox.classList.remove('active');
+                }
+            });
+        }
     }
 });

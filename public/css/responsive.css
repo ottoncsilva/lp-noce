@@ -1,45 +1,57 @@
 /* Responsive Media Queries - Mobile First & Tweaks */
 @media screen and (max-width: 768px) {
     /* Manifesto Fix Spacing */
-    .manifesto { padding: 4rem 5vw; }
+    .manifesto { padding: 3rem 5vw; }
     .manifesto-wrap {
         flex-direction: column;
         text-align: center;
         gap: 0;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
     .manifesto-wrap h2 {
         white-space: normal;
         line-height: 1.2;
     }
 
-    .cta-mid { padding: 3rem 2rem; }
+    .cta-mid { padding: 1.5rem 2rem; }
 
-    /* Processo — horizontal no mobile (scroll lateral suave) */
+    /* Processo — vertical compacto no mobile para aparecer direto na tela */
+    .processo {
+        padding: 4rem 0;
+        min-height: auto;
+    }
     .proc-steps {
-        flex-direction: row;
+        flex-direction: column;
         flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
         justify-content: flex-start;
         align-items: flex-start;
-        gap: 2rem;
-        padding: 0 4vw;
-        scroll-snap-type: x mandatory;
+        gap: 1.5rem;
+        padding: 0 5vw;
     }
     .step {
-        min-width: 130px;
-        max-width: 160px;
+        width: 100%;
+        max-width: 100%;
+        min-width: unset;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: 1rem;
+    }
+    .step p, .step span {
+        margin: 0;
+        text-align: left;
+    }
+    .step-num {
+        margin: 0;
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
         flex-shrink: 0;
-        scroll-snap-align: start;
-        width: auto;
     }
     .proc-linha-progresso {
-        top: 30px;
-        left: 4vw;
-        width: calc(100% - 8vw);
-        height: 1px;
-        transform: none;
+        display: none;
     }
 
     /* Contato CTA */
