@@ -638,28 +638,7 @@ html {
     filter: brightness(0) saturate(100%); /* Logo preta para seções claras */
 }
 
-/* 7. SECTION COLOR TRANSITIONS */
-.section-transition-top {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    pointer-events: none;
-    z-index: 5;
-}
-/* Verde → Branco */
-.acabamentos-sec .section-transition-top {
-    background: linear-gradient(to bottom, var(--noce-green), transparent);
-}
-/* Branco → Verde (Processo) */
-.processo .section-transition-top {
-    background: linear-gradient(to bottom, var(--noce-white), transparent);
-}
-/* FAQ → Verde (Contato) */
-.contato .section-transition-top {
-    background: linear-gradient(to bottom, var(--noce-white), transparent);
-}
+/* 7. SECTION COLOR TRANSITIONS (REMOVIDO) */
 
 /* 8. SHIMMER NOS BOTÕES CTA */
 .btn-cta-final {
@@ -676,10 +655,10 @@ html {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255,255,255,0.15),
+        rgba(255,255,255,0.04), /* Brilho bem sutil */
         transparent
     );
-    animation: shimmer 4s ease-in-out infinite;
+    animation: shimmer 12s ease-in-out infinite; /* Muito mais lento */
     pointer-events: none;
 }
 @keyframes shimmer {
