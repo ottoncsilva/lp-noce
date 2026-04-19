@@ -139,6 +139,7 @@
         width: 100vw;
     }
     .gallery-item img {
+        object-fit: var(--fit-mob, cover);
         object-position: var(--pos-mob, center center);
     }
 

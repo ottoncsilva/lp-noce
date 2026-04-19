@@ -293,7 +293,7 @@ html {
 .gallery-item img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--fit-desk, cover);
     object-position: var(--pos-desk, center center);
 }
 .gallery-item .overlay-title {

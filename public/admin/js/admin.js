@@ -990,7 +990,7 @@ async function removeHeroBg() {
 // CROP MODAL — FRAME ARRASTÁVEL (Editor de Imagem)
 // ─────────────────────────────────────────────────────────────
 
-let cropState = { secId: '', idx: -1, desk: '50% 50%', mob: '50% 50%' };
+let cropState = { secId: '', idx: -1, desk: '50% 50%', mob: '50% 50%', fitDesk: 'cover', fitMob: 'cover' };
 let _currentCropTab = 'desk'; // 'desk' ou 'mob'
 
 // Aspect ratios do frame para cada formato
@@ -1021,9 +1021,52 @@ function switchCropTab(tab) {
         document.getElementById('crop-label-hint').textContent = '9:16 Mobile';
     }
 
+    // Atualizar botões de modo (cover/contain) para o tab ativo
+    const currentFit = tab === 'desk' ? cropState.fitDesk : cropState.fitMob;
+    updateFitModeUI(currentFit);
+
     // Reposiciona o frame para a posição salva do tab ativo
     const pos = tab === 'desk' ? cropState.desk : cropState.mob;
     positionFrameFromPercent(pos, tab);
+}
+
+function setCropFitMode(mode) {
+    if (_currentCropTab === 'desk') {
+        cropState.fitDesk = mode;
+    } else {
+        cropState.fitMob = mode;
+    }
+    updateFitModeUI(mode);
+    // Reposicionar o frame
+    const pos = _currentCropTab === 'desk' ? cropState.desk : cropState.mob;
+    positionFrameFromPercent(pos, _currentCropTab);
+}
+
+function updateFitModeUI(mode) {
+    const btnCover   = document.getElementById('crop-mode-cover');
+    const btnContain = document.getElementById('crop-mode-contain');
+    const hint       = document.getElementById('crop-mode-hint');
+    const frame      = document.getElementById('crop-frame');
+    
+    if (mode === 'contain') {
+        btnContain.style.background = 'var(--noce-green)';
+        btnContain.style.color = '#fff';
+        btnContain.style.borderColor = 'var(--noce-green)';
+        btnCover.style.background = 'transparent';
+        btnCover.style.color = '';
+        btnCover.style.borderColor = 'var(--border)';
+        hint.textContent = 'A foto será exibida inteira, sem corte. Pode haver margens laterais/superiores.';
+        frame.style.display = 'none';
+    } else {
+        btnCover.style.background = 'var(--noce-green)';
+        btnCover.style.color = '#fff';
+        btnCover.style.borderColor = 'var(--noce-green)';
+        btnContain.style.background = 'transparent';
+        btnContain.style.color = '';
+        btnContain.style.borderColor = 'var(--border)';
+        hint.textContent = 'A foto preencherá a tela toda. Arraste o quadro para escolher a área visível.';
+        frame.style.display = '';
+    }
 }
 
 function positionFrameFromPercent(posStr, tab) {
@@ -1088,7 +1131,12 @@ function openCropModal(secId, idx, deskPos, mobPos) {
     if (!deskPos || deskPos === 'center center') deskPos = '50% 50%';
     if (!mobPos  || mobPos === 'center center')  mobPos  = '50% 50%';
 
-    cropState = { secId, idx, desk: deskPos, mob: mobPos };
+    // Ler fitDesktop/fitMobile salvos
+    const item = siteData.sections[secId].images[idx];
+    const fitDesk = (typeof item === 'object' && item.fitDesktop) ? item.fitDesktop : 'cover';
+    const fitMob  = (typeof item === 'object' && item.fitMobile)  ? item.fitMobile  : 'cover';
+
+    cropState = { secId, idx, desk: deskPos, mob: mobPos, fitDesk, fitMob };
     _currentCropTab = 'desk';
 
     // Carregar imagem
@@ -1157,15 +1205,17 @@ function closeCropModal() {
 }
 
 async function confirmCrop() {
-    const { secId, idx, desk, mob } = cropState;
+    const { secId, idx, desk, mob, fitDesk, fitMob } = cropState;
     if (idx === -1) return;
 
     const imgArr = siteData.sections[secId].images;
     if (typeof imgArr[idx] === 'string') {
-        imgArr[idx] = { src: imgArr[idx], caption: '', positionDesktop: desk, positionMobile: mob };
+        imgArr[idx] = { src: imgArr[idx], caption: '', positionDesktop: desk, positionMobile: mob, fitDesktop: fitDesk, fitMobile: fitMob };
     } else {
         imgArr[idx].positionDesktop = desk;
         imgArr[idx].positionMobile  = mob;
+        imgArr[idx].fitDesktop = fitDesk;
+        imgArr[idx].fitMobile  = fitMob;
     }
 
     await saveContent(false);

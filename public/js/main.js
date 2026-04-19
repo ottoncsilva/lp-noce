@@ -167,10 +167,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 const safePosDesk = /^[\w% ]+$/.test(posDesk) ? posDesk : 'center center';
                                 const safePosMob = /^[\w% ]+$/.test(posMob) ? posMob : 'center center';
 
+                                const fitDesk = typeof img === 'object' && img.fitDesktop ? img.fitDesktop : 'cover';
+                                const fitMob  = typeof img === 'object' && img.fitMobile  ? img.fitMobile  : 'cover';
+
                                 return `
                                 <div class="gallery-item">
                                     <img src="${imgSrc}" alt="${sectionLabel} - Noce Mobili" loading="lazy"
-                                        style="--pos-desk: ${safePosDesk}; --pos-mob: ${safePosMob};" width="1920" height="1080">
+                                        style="--pos-desk: ${safePosDesk}; --pos-mob: ${safePosMob}; --fit-desk: ${fitDesk}; --fit-mob: ${fitMob};" width="1920" height="1080">
                                     ${imgCap ? `<div class="micro-caption">${imgCap}</div>` : ''}
                                     <div class="gallery-sweep-line"></div>
                                 </div>
