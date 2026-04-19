@@ -83,6 +83,12 @@
     }
 
     /* ── CONTATO CTA ── */
+    /* Lightbox — mobile: padding menor, setas menores */
+    .lb-slide { padding: 3.5rem 0.5rem 3rem; }
+    .lb-arrow { width: 40px; height: 40px; }
+    .lb-prev  { left: 0.75rem; }
+    .lb-next  { right: 0.75rem; }
+
     .contato {
         min-height: calc(var(--real-vh, 1dvh) * 100);
     }

@@ -452,23 +452,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             y: -6, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut"
         });
 
-        // 9. Lightbox for Gallery Items
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        
-        if (lightbox && lightboxImg) {
-            // Event delegation on body for gallery items
-            document.body.addEventListener('click', (e) => {
-                const galleryImg = e.target.closest('.gallery-item img');
-                if (galleryImg) {
-                    lightboxImg.src = galleryImg.src;
-                    lightbox.classList.add('active');
-                } else if (lightbox.classList.contains('active')) {
-                    // Clicou fora da imagem ou em qualquer lugar
-                    lightbox.classList.remove('active');
-                }
-            });
-        }
+        // 9. Lightbox Gallery — navegação lateral, foto completa, swipe + teclado
+        initLightboxGallery();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -639,6 +624,131 @@ document.addEventListener("DOMContentLoaded", async () => {
                 duration: 1.2,
                 ease: 'power3.out'
             });
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LIGHTBOX GALLERY
+    // ═══════════════════════════════════════════════════════════════
+
+    function initLightboxGallery() {
+        const lb      = document.getElementById('lightbox');
+        const track   = document.getElementById('lb-track');
+        const counter = document.getElementById('lb-counter');
+        const btnClose = document.getElementById('lb-close');
+        const btnPrev  = document.getElementById('lb-prev');
+        const btnNext  = document.getElementById('lb-next');
+        if (!lb || !track) return;
+
+        let images = [];   // array of src strings for current section
+        let idx = 0;       // current index
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isDragging  = false;
+        let dragStartX  = 0;
+        let dragOffset  = 0;
+
+        function open(srcs, startIdx) {
+            images = srcs;
+            idx    = startIdx;
+
+            track.innerHTML = images.map(src =>
+                `<div class="lb-slide"><img src="${escHtml(src)}" alt="" draggable="false"></div>`
+            ).join('');
+
+            lb.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            update(false);
+        }
+
+        function close() {
+            lb.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function update(animate = true) {
+            if (!animate) track.style.transition = 'none';
+            track.style.transform = `translateX(calc(-${idx} * 100vw))`;
+            if (!animate) requestAnimationFrame(() => { track.style.transition = ''; });
+
+            counter.textContent = `${idx + 1} / ${images.length}`;
+            btnPrev.classList.toggle('hidden', idx === 0);
+            btnNext.classList.toggle('hidden', idx === images.length - 1);
+        }
+
+        function prev() { if (idx > 0) { idx--; update(); } }
+        function next() { if (idx < images.length - 1) { idx++; update(); } }
+
+        // Click on gallery image
+        document.body.addEventListener('click', e => {
+            const img = e.target.closest('.gallery-item img');
+            if (!img) return;
+            const section = img.closest('.ambiente-pin-wrap');
+            if (!section) return;
+            const allImgs = [...section.querySelectorAll('.gallery-item img')];
+            const clickedIdx = allImgs.indexOf(img);
+            open(allImgs.map(i => i.src), clickedIdx);
+        });
+
+        // Close button
+        btnClose.addEventListener('click', close);
+
+        // Click on backdrop (outside slide area)
+        lb.addEventListener('click', e => {
+            if (e.target === lb || e.target === document.getElementById('lb-track-wrap')) close();
+        });
+
+        // Arrow buttons
+        btnPrev.addEventListener('click', e => { e.stopPropagation(); prev(); });
+        btnNext.addEventListener('click', e => { e.stopPropagation(); next(); });
+
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            if (!lb.classList.contains('active')) return;
+            if (e.key === 'Escape')      close();
+            if (e.key === 'ArrowRight')  next();
+            if (e.key === 'ArrowLeft')   prev();
+        });
+
+        // Touch swipe
+        lb.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        lb.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 45) {
+                if (dx < 0) next(); else prev();
+            }
+        }, { passive: true });
+
+        // Mouse drag (desktop)
+        track.addEventListener('mousedown', e => {
+            if (e.target.closest('.lb-close, .lb-arrow')) return;
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragOffset = 0;
+            track.style.transition = 'none';
+            track.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            dragOffset = e.clientX - dragStartX;
+            const base = -idx * window.innerWidth;
+            track.style.transform = `translateX(${base + dragOffset}px)`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            track.style.cursor = '';
+            track.style.transition = '';
+            if (dragOffset < -60) next();
+            else if (dragOffset > 60) prev();
+            else update();
         });
     }
 });
