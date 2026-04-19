@@ -118,10 +118,14 @@ html.lenis { height: auto; }
 }
 
 /* SECTIONS */
+html {
+    background-color: var(--noce-green); /* Cor de fundo base para o scroll bounce e gap do URL bar */
+}
+
 .section {
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh; /* Evita que o sumiço da barra do navegador deixe um buraco na tela no mobile */
     overflow: hidden;
 }
 

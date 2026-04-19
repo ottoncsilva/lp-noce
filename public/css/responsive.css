@@ -123,8 +123,21 @@
 
     /* Parceiros — horizontal no mobile */
     .parceiros-title { top: 5vh; font-size: clamp(2rem, 8vw, 3rem); }
-    .parceiros-spotlight { padding-top: 4vh; padding-bottom: 4vh; gap: 5vw; }
-    .parc-logo { width: 90px; max-width: 28vw; margin: 1vh 0; }
+    .parceiros-spotlight { 
+        padding-top: 4vh; 
+        padding-bottom: 4vh; 
+        gap: 4vw; 
+        justify-content: center;
+    }
+    .parc-logo { 
+        width: 26vw; 
+        height: 26vw;
+        border-radius: 50%;
+        background-color: var(--noce-white);
+        object-fit: contain;
+        padding: 4vw;
+        margin: 1vh 0; 
+    }
 
     /* Materialidade — centralização simétrica no mobile */
     .acabamentos-wrapper {
