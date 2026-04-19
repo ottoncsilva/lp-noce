@@ -580,6 +580,16 @@
             </div>
             <p id="crop-mode-hint" style="font-size:0.72rem; color:var(--text-light); margin:-0.5rem 0 0.75rem; font-style:italic;"></p>
 
+            <!-- Atalhos de posicionamento rápido -->
+            <div style="display:flex; gap:6px; margin-bottom:0.75rem; flex-wrap:wrap;">
+                <span style="font-size:0.72rem; color:var(--text-light); align-self:center; margin-right:2px;">Atalhos:</span>
+                <button onclick="snapCropFrame('center')"   style="padding:4px 10px; border-radius:14px; border:1px solid var(--border); background:#fff; font-size:0.7rem; cursor:pointer;">⊙ Centro</button>
+                <button onclick="snapCropFrame('width')"    style="padding:4px 10px; border-radius:14px; border:1px solid var(--border); background:#fff; font-size:0.7rem; cursor:pointer;">↔ Largura Total</button>
+                <button onclick="snapCropFrame('height')"   style="padding:4px 10px; border-radius:14px; border:1px solid var(--border); background:#fff; font-size:0.7rem; cursor:pointer;">↕ Altura Total</button>
+                <button onclick="snapCropFrame('top')"      style="padding:4px 10px; border-radius:14px; border:1px solid var(--border); background:#fff; font-size:0.7rem; cursor:pointer;">⬆ Topo</button>
+                <button onclick="snapCropFrame('bottom')"   style="padding:4px 10px; border-radius:14px; border:1px solid var(--border); background:#fff; font-size:0.7rem; cursor:pointer;">⬇ Base</button>
+            </div>
+
             <!-- Canvas area: imagem + frame arrastável -->
             <div id="crop-canvas-wrap" style="position:relative; width:100%; background:#111; border-radius:8px; overflow:hidden; user-select:none; touch-action:none;">
                 <!-- Imagem completa -->

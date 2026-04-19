@@ -157,6 +157,12 @@ function renderSidebar() {
                 </div>
             </div>
 
+            <div class="nav-section-title" style="margin-top:0.5rem;">Seções</div>
+            <button class="nav-item" data-target="processo" onclick="activatePanel('processo')">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+                Nosso Processo
+            </button>
+
             <div class="nav-section-title" style="margin-top:0.5rem;">Catálogo</div>
             <button class="nav-item" data-target="acabamentos" onclick="activatePanel('acabamentos')">
                 ${iconPalette()} Acabamentos
@@ -206,6 +212,7 @@ function buildPanels() {
         }
     });
 
+    buildProcessoPanel(container);
     buildListPanel(container, 'acabamentos', siteData.acabamentos);
     buildListPanel(container, 'parceiros', siteData.parceiros);
 }
@@ -480,19 +487,15 @@ function buildConteudoPanel(container) {
                 </div>
             </div>
 
-            <!-- PROCESSO SECTION -->
+            <!-- PROCESSO — link para o painel dedicado -->
             <div class="card">
-                <div class="card-header">
-                    <h3>O Nosso Processo (Etapas)</h3>
-                    <button class="btn btn-sm" onclick="addProcessoItem()">+ Adicionar Etapa</button>
-                </div>
-                <div class="form-group">
-                    <label>Título da Seção de Processo (Ex: O Nosso Processo)</label>
-                    <input type="text" id="inp-txt-processo" value="${escHtml(t.processoTitle || 'O Nosso Processo')}">
-                </div>
-                <div id="processo-list">
-                    ${proc.map((item, idx) => buildConfigItemRow('processo', item, idx)).join('')}
-                </div>
+                <div class="card-header"><h3>Nosso Processo</h3></div>
+                <p style="font-size:0.85rem;color:var(--text-light);">
+                    Gerencie as etapas e o texto narrativo do processo no painel dedicado.
+                </p>
+                <button class="btn btn-outline" style="margin-top:0.75rem;" onclick="activatePanel('processo')">
+                    → Abrir Painel Nosso Processo
+                </button>
             </div>
         </div>
     `);
@@ -546,6 +549,51 @@ function buildConfigPanel(container) {
             </div>
         </div>
     `);
+}
+
+// ── Panel: Nosso Processo
+function buildProcessoPanel(container) {
+    const t = siteData.texts || {};
+    const proc = siteData.processo ? (siteData.processo.items || []) : [];
+    const narrative = siteData.processo ? (siteData.processo.narrative || '') : '';
+
+    container.insertAdjacentHTML('beforeend', `
+        <div class="panel" id="panel-processo">
+            <div class="card">
+                <div class="card-header"><h3>Título da Seção</h3></div>
+                <div class="form-group">
+                    <label>Título exibido na seção (Ex: O Nosso Processo)</label>
+                    <input type="text" id="inp-processo-title" value="${escHtml(t.processoTitle || 'O Nosso Processo')}">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>Texto Narrativo</h3></div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">
+                    Texto completo exibido na seção verde. Se deixado em branco, será gerado automaticamente a partir das etapas abaixo.
+                </p>
+                <div class="form-group">
+                    <label>Narrativa personalizada (opcional)</label>
+                    <textarea id="inp-processo-narrative" rows="6" placeholder="Deixe em branco para gerar automaticamente a partir das etapas...">${escHtml(narrative)}</textarea>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Etapas do Processo</h3>
+                    <button class="btn btn-sm" onclick="addProcessoItem()">+ Adicionar Etapa</button>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">
+                    Defina as etapas do processo. O título de cada etapa é usado na narrativa automática.
+                </p>
+                <div id="list-processo">
+                    ${proc.map((item, idx) => buildConfigItemRow('processo', item, idx)).join('')}
+                </div>
+            </div>
+        </div>
+    `);
+
+    setupListDrag('processo');
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1069,7 +1117,7 @@ function updateFitModeUI(mode) {
     }
 }
 
-function positionFrameFromPercent(posStr, tab) {
+function positionFrameFromPercent(posStr, tab, fitMode) {
     const frame = document.getElementById('crop-frame');
     const canvas = document.getElementById('crop-canvas-wrap');
     const img = document.getElementById('cp-full-img');
@@ -1079,18 +1127,21 @@ function positionFrameFromPercent(posStr, tab) {
     const canvasH = canvas.clientHeight || img.clientHeight;
     const ratio   = CROP_RATIOS[tab];
 
-    // Frame dimensions
+    // Detect natural image orientation to determine best frame size
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+
+    // Frame dimensions — allow full canvas coverage
     let fw, fh;
     if (ratio >= 1) {
-        // Paisagem: largura máxima 80% do canvas
-        fw = canvasW * 0.8;
+        // Paisagem: largura total do canvas
+        fw = canvasW;
         fh = fw / ratio;
-        if (fh > canvasH * 0.85) { fh = canvasH * 0.85; fw = fh * ratio; }
+        if (fh > canvasH) { fh = canvasH; fw = fh * ratio; }
     } else {
-        // Retrato: altura máxima 85% do canvas
-        fh = canvasH * 0.85;
+        // Retrato: altura total do canvas
+        fh = canvasH;
         fw = fh * ratio;
-        if (fw > canvasW * 0.7) { fw = canvasW * 0.7; fh = fw / ratio; }
+        if (fw > canvasW) { fw = canvasW; fh = fw / ratio; }
     }
 
     frame.style.width  = fw + 'px';
@@ -1140,7 +1191,6 @@ function openCropModal(secId, idx, deskPos, mobPos) {
     _currentCropTab = 'desk';
 
     // Carregar imagem
-    const item = siteData.sections[secId].images[idx];
     const src  = typeof item === 'string' ? item : item.src;
     const fullImg = document.getElementById('cp-full-img');
     fullImg.src = src;
@@ -1198,6 +1248,43 @@ function setupFrameDrag() {
     frame.addEventListener('touchstart', e => { e.preventDefault(); onDown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
     window.addEventListener('touchmove', e => { if (isDragging) { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }}, { passive: false });
     window.addEventListener('touchend',  onUp);
+}
+
+function snapCropFrame(preset) {
+    const frame  = document.getElementById('crop-frame');
+    const canvas = document.getElementById('crop-canvas-wrap');
+    if (!frame || !canvas) return;
+
+    const fw = frame.offsetWidth;
+    const fh = frame.offsetHeight;
+    const maxX = canvas.clientWidth  - fw;
+    const maxY = canvas.clientHeight - fh;
+
+    let newL = parseFloat(frame.style.left) || 0;
+    let newT = parseFloat(frame.style.top)  || 0;
+
+    if (preset === 'center') {
+        newL = maxX / 2;
+        newT = maxY / 2;
+    } else if (preset === 'width') {
+        // Snap frame horizontally to left edge, centered vertically
+        newL = 0;
+        newT = maxY / 2;
+    } else if (preset === 'height') {
+        // Snap frame to top edge, centered horizontally
+        newL = maxX / 2;
+        newT = 0;
+    } else if (preset === 'top') {
+        newT = 0;
+    } else if (preset === 'bottom') {
+        newT = maxY;
+    }
+
+    frame.style.left = Math.max(0, Math.min(maxX, newL)) + 'px';
+    frame.style.top  = Math.max(0, Math.min(maxY, newT)) + 'px';
+
+    const pos = frameToPercent();
+    cropState[_currentCropTab] = pos;
 }
 
 function closeCropModal() {
@@ -1287,13 +1374,21 @@ async function saveContent(showMsg = true) {
         {id: 'inp-txt-materialidade', key: 'materialidadeTitle'},
         {id: 'inp-txt-parceiros', key: 'parceirosTitle'},
         {id: 'inp-txt-faq', key: 'faqTitle'},
-        {id: 'inp-txt-processo', key: 'processoTitle'},
         {id: 'inp-txt-midcta', key: 'midCta'}
     ];
     tFields.forEach(f => {
         const el = document.getElementById(f.id);
         if (el) siteData.texts[f.key] = el.value;
     });
+
+    // Processo panel fields
+    const processoTitleEl = document.getElementById('inp-processo-title');
+    if (processoTitleEl) siteData.texts.processoTitle = processoTitleEl.value;
+    const processoNarrativeEl = document.getElementById('inp-processo-narrative');
+    if (processoNarrativeEl) {
+        if (!siteData.processo) siteData.processo = { items: [] };
+        siteData.processo.narrative = processoNarrativeEl.value;
+    }
 
     try {
         const res = await fetch('/api/content', {
@@ -1327,7 +1422,7 @@ async function addProcessoItem() {
     if (!siteData.processo.items) siteData.processo.items = [];
     siteData.processo.items.push({ num: '0' + (siteData.processo.items.length + 1), title: 'Nova Etapa', desc: '' });
     await saveContent(false);
-    rebuildCurrentPanel('conteudo');
+    rebuildCurrentPanel('processo');
 }
 
 function updateConfigItem(section, index, field, value) {
@@ -1342,7 +1437,7 @@ async function deleteConfigItem(section, index) {
     if (siteData[section] && siteData[section].items) {
         siteData[section].items.splice(index, 1);
         await saveContent(false);
-        rebuildCurrentPanel('conteudo');
+        rebuildCurrentPanel(section === 'processo' ? 'processo' : 'conteudo');
         showToast('Item removido', 'info');
     }
 }
