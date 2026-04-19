@@ -174,14 +174,10 @@
         overflow: hidden;
         box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     }
-    /* Tamanhos alternados para quebrar monotonia */
-    .swatch:nth-child(odd) {
-        width: 42vw;
-        height: 42vw;
-    }
-    .swatch:nth-child(even) {
-        width: 36vw;
-        height: 36vw;
+    /* Tamanho uniforme em todos os círculos */
+    .swatch {
+        width: 40vw;
+        height: 40vw;
     }
     .swatch .name {
         opacity: 1; /* always visible on mobile */

@@ -48,17 +48,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         setTimeout(() => {
             initAnimations();
             initPremiumFeatures();
-            // 1. Dismiss loader — delay mínimo para não piscar
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                if (loader) loader.classList.add('hidden');
-            }, 800);
         }, 100);
     } catch (err) {
         console.error("Error loading content:", err);
-        // Dismiss loader even on error
-        const loader = document.getElementById('loader');
-        if (loader) loader.classList.add('hidden');
         const hero = document.querySelector('.hero');
         if (hero) {
             const notice = document.createElement('p');
