@@ -351,32 +351,25 @@ html {
     box-shadow: 0 30px 60px rgba(0,0,0,0.2);
 }
 
-/* PROCESSO */
+/* PROCESSO — Texto Narrativo */
 .processo {
     background: var(--noce-green);
     color: var(--noce-white);
-    display: flex; flex-direction: column; justify-content: center;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
     position: relative;
-    padding: 6vh 0 4rem;
+    padding: 6vh 5vw;
 }
-.proc-head { text-align: center; margin-bottom: 4rem; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: 0.05em;}
-.proc-steps {
-    display: flex; justify-content: space-around; align-items: flex-start;
-    position: relative; z-index: 2;
-    padding: 0 2vw;
-    gap: 1rem;
+.processo-content {
+    max-width: 640px;
+    text-align: center;
 }
-.step { text-align: center; flex: 1; max-width: 160px; }
-.step p { word-break: break-word; }
-.step-num {
-    font-size: 2rem; width: 60px; height: 60px;
-    border: 1px solid var(--noce-white); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 1rem; background: var(--noce-green);
-}
-.proc-linha-progresso {
-    position: absolute; top: 50%; left: 10vw; width: 80vw; height: 1px;
-    background: rgba(255,255,255,0.2); z-index: 1;
+.proc-narrative {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    line-height: 2;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.85);
+    margin-top: 2rem;
 }
 
 /* PARCEIROS (Spotlight) */
@@ -386,12 +379,13 @@ html {
     position: relative;
 }
 .parceiros-title {
-    position: sticky; top: 10vh; text-align: center;
+    text-align: center;
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 100; /* Hairline */
     font-family: 'Aktiv Grotesk', sans-serif;
     letter-spacing: 0.05em;
     padding: 0 5vw;
+    margin-bottom: 3rem;
 }
 .parceiros-spotlight {
     display: flex;
@@ -429,6 +423,34 @@ html {
 .btn-outline {
     padding: 1.5rem 3rem; border: 1px solid var(--noce-white);
     color: var(--noce-white); letter-spacing: 0.25em; text-transform: uppercase; font-size: 12px;
+}
+/* Botão Premium Glassmorphism Pílula */
+.btn-cta-final {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 2.5rem;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 80px;
+    color: var(--noce-white);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 300;
+    text-decoration: none;
+    transition: all 0.35s ease;
+    cursor: pointer;
+}
+.btn-cta-final:hover {
+    background: rgba(255,255,255,0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.btn-cta-final svg {
+    flex-shrink: 0;
 }
 .minimal-footer { position: relative; margin-top: 4rem; font-size: 10px; color: rgba(255,255,255,0.4); }
 

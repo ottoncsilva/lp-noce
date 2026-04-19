@@ -1,7 +1,25 @@
 /* Responsive Media Queries - Mobile First & Tweaks */
 @media screen and (max-width: 768px) {
-    /* Manifesto Fix Spacing */
-    .manifesto { padding: 3rem 5vw; }
+    /* Base mobile: body verde para eliminar faixa branca no overscroll */
+    body { background-color: var(--noce-green); }
+
+    /* Scroll Snap magnético — proximity = puxa suavemente, não prende */
+    #app {
+        scroll-snap-type: y proximity;
+    }
+    .section, .ambiente-pin-wrap {
+        scroll-snap-align: start;
+    }
+
+    /* ── MANIFESTO ── */
+    .manifesto {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 5vw;
+    }
     .manifesto-wrap {
         flex-direction: column;
         text-align: center;
@@ -13,58 +31,77 @@
         line-height: 1.2;
     }
 
-    .cta-mid { padding: 1.5rem 2rem; }
+    /* ── CTA MID (Cola embaixo do manifesto, sem tela própria) ── */
+    .cta-mid {
+        min-height: auto !important;
+        padding: 0 5vw 4rem;
+    }
 
-    /* Processo — vertical compacto no mobile para aparecer direto na tela */
+    /* ── PROCESSO — Texto narrativo centralizado ── */
     .processo {
-        padding: 4rem 0;
-        min-height: auto;
-    }
-    .proc-steps {
-        flex-direction: column;
-        flex-wrap: nowrap;
-        overflow: hidden;
-        justify-content: flex-start;
-        align-items: flex-start;
-        gap: 1.5rem;
-        padding: 0 5vw;
-    }
-    .step {
-        width: 100%;
-        max-width: 100%;
-        min-width: unset;
+        min-height: 100dvh;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        text-align: left;
-        gap: 1rem;
+        padding: 4rem 6vw;
     }
-    .step p, .step span {
+    .processo-content {
+        text-align: center;
+    }
+    /* Ocultar estrutura antiga caso sobreviva */
+    .proc-steps, .proc-linha-progresso { display: none; }
+
+    /* ── PARCEIROS — Grid 3 colunas com clips circulares ── */
+    .parceiros-sec {
+        min-height: auto;
+        padding: 5rem 5vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .parceiros-title {
+        position: static;
+        font-size: clamp(2rem, 8vw, 3rem);
+        margin-bottom: 2.5rem;
+    }
+    .parceiros-spotlight {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5vw;
+        padding: 0;
+        justify-items: center;
+        width: 100%;
+    }
+    .parc-logo {
+        width: 22vw;
+        height: 22vw;
+        border-radius: 50%;
+        object-fit: cover;
+        background: none;
+        padding: 0;
         margin: 0;
-        text-align: left;
+        opacity: 0.85;
+        filter: none;
     }
-    .step-num {
-        margin: 0;
-        width: 45px;
-        height: 45px;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-    .proc-linha-progresso {
-        display: none;
+    .parc-logo.active {
+        opacity: 1;
+        transform: scale(1.08);
     }
 
-    /* Contato CTA */
+    /* ── CONTATO CTA ── */
+    .contato {
+        min-height: 100dvh;
+    }
     .cta-btns {
         flex-direction: column;
         width: 100%;
         padding: 0 2rem;
+        gap: 1rem;
     }
-    .btn-outline {
-        text-align: center;
-    }
-    
-    /* Ambiente Entry Fix */
+
+    /* ── AMBIENTE ENTRY FIX ── */
     .ambiente-entry h2 {
         font-size: clamp(3rem, 15vw, 6rem);
     }
@@ -121,31 +158,18 @@
         text-align: center;
     }
 
-    /* Parceiros — horizontal no mobile */
-    .parceiros-title { top: 5vh; font-size: clamp(2rem, 8vw, 3rem); }
-    .parceiros-spotlight { 
-        padding-top: 4vh; 
-        padding-bottom: 4vh; 
-        gap: 4vw; 
-        justify-content: center;
+    /* ── MATERIALIDADE — Círculos dinâmicos ── */
+    .acabamentos-sec {
+        min-height: auto;
     }
-    .parc-logo { 
-        width: 26vw; 
-        height: 26vw;
-        border-radius: 50%;
-        background-color: var(--noce-white);
-        object-fit: contain;
-        padding: 4vw;
-        margin: 1vh 0; 
-    }
-
-    /* Materialidade — centralização simétrica no mobile */
     .acabamentos-wrapper {
         min-height: auto;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.15rem;
-        padding: 0 4vw 4rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 5vw 3rem;
         width: 100%;
         overflow: visible;
     }
@@ -154,13 +178,29 @@
         left: auto !important;
         top: auto !important;
         transform: none !important; /* block GSAP parallax on mobile */
-        width: 100%;
-        height: 200px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    /* Tamanhos alternados para quebrar monotonia */
+    .swatch:nth-child(odd) {
+        width: 42vw;
+        height: 42vw;
+    }
+    .swatch:nth-child(even) {
+        width: 36vw;
+        height: 36vw;
     }
     .swatch .name {
         opacity: 1; /* always visible on mobile */
-        padding: 0.5rem;
-        font-size: 10px;
+        padding: 0.4rem 0.6rem;
+        font-size: 9px;
+        text-align: center;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(6px);
+        color: var(--noce-white);
+        border-radius: 0 0 50% 50%;
+        letter-spacing: 0.08em;
     }
 }
 
@@ -213,12 +253,11 @@
         align-items: center;
         gap: 1rem;
     }
-    .btn-outline { text-align: center; }
+    .btn-outline, .btn-cta-final { text-align: center; }
 
     /* Parceiros: logos um pouco menores */
     .parc-logo { width: 160px; margin: 5vh 0; }
 
-    /* Processo: steps com mais espaço */
-    .proc-steps { gap: 0.5rem; }
-    .step { max-width: 130px; }
+    /* Processo: text centered on tablet too */
+    .processo-content { max-width: 70vw; }
 }

@@ -206,28 +206,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // Processo
-        if(data.processo && data.processo.items && data.processo.items.length > 0) {
-            const procContainer = document.getElementById('proc-steps-container');
-            if (procContainer) {
-                data.processo.items.forEach(item => {
-                    const html = `<div class="step">
-                                    <div class="step-num">${escHtml(item.num)}</div>
-                                    <p>${escHtml(item.title)}</p>
-                                    ${item.desc ? `<span style="display:block; font-size:0.75rem; margin-top:5px; opacity:0.8;">${escHtml(item.desc)}</span>` : ''}
-                                  </div>`;
-                    procContainer.insertAdjacentHTML('beforeend', html);
-                });
-            }
-        } else {
-            // Fallback default structure
-            const procContainer = document.getElementById('proc-steps-container');
-            if (procContainer && procContainer.children.length === 0) {
-                procContainer.innerHTML = `
-                <div class="step"><div class="step-num">1</div><p>Escuta</p></div>
-                <div class="step"><div class="step-num">2</div><p>Curadoria</p></div>
-                <div class="step"><div class="step-num">3</div><p>Projeto</p></div>
-                <div class="step"><div class="step-num">4</div><p>Entrega</p></div>`;
+        // Processo — Texto narrativo
+        const procNarrative = document.getElementById('proc-narrative');
+        if (procNarrative) {
+            const defaultNarrative = 'Tudo começa com a Escuta — onde entendemos seu estilo, rotina e desejos. A partir daí, a Curadoria seleciona materiais e acabamentos que traduzem a sua essência. O Projeto ganha forma em cada detalhe milimétrico. E a Entrega transforma o papel em realidade.';
+            
+            if (data.processo && data.processo.items && data.processo.items.length > 0) {
+                // Compor narrativa a partir dos items da API
+                const titles = data.processo.items.map(i => escHtml(i.title));
+                const narrative = `Tudo começa com a ${titles[0] || 'Escuta'} — onde entendemos seu estilo, rotina e desejos. A partir daí, a ${titles[1] || 'Curadoria'} seleciona materiais e acabamentos que traduzem a sua essência. O ${titles[2] || 'Projeto'} ganha forma em cada detalhe milimétrico. E a ${titles[3] || 'Entrega'} transforma o papel em realidade.`;
+                procNarrative.textContent = narrative;
+            } else {
+                procNarrative.textContent = defaultNarrative;
             }
         }
 
@@ -423,21 +413,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
-        // 6. Processo Steps Animation (Sequential Reveal)
-        const steps = document.querySelectorAll('.step');
-        steps.forEach((step, i) => {
-            gsap.from(step, {
+        // 6. Processo Narrative Animation (Fade Up)
+        const procNarrEl = document.querySelector('.proc-narrative');
+        if (procNarrEl) {
+            gsap.from(procNarrEl, {
                 scrollTrigger: {
-                    trigger: '.proc-steps',
+                    trigger: '.processo',
                     start: "top 70%",
                 },
-                y: 40,
+                y: 30,
                 opacity: 0,
-                duration: 0.8,
-                delay: i * 0.2,
+                duration: 1.2,
                 ease: "power3.out"
             });
-        });
+        }
 
         // 7. FAQ Animation
         const faqItems = document.querySelectorAll('.faq-item');
