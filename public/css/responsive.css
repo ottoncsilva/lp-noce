@@ -136,9 +136,13 @@
     .gallery-item {
         scroll-snap-align: center;
         height: 65vh;
+        width: auto; /* Mantém proporção original */
     }
     .gallery-item img {
-        object-position: var(--pos-mob, center center);
+        height: 100%;
+        width: auto;
+        display: block;
+        object-fit: contain;
     }
 
     /* Ajuste para as novas legendas não sumirem */
