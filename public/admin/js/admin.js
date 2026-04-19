@@ -210,22 +210,36 @@ function buildPanels() {
     buildListPanel(container, 'parceiros', siteData.parceiros);
 }
 
-// ── Panel: Identidade (logotipo apenas)
+// ── Panel: Identidade (logotipos separados)
 function buildGeralPanel(container) {
     container.insertAdjacentHTML('beforeend', `
         <div class="panel" id="panel-geral">
             <div class="card">
                 <div class="card-header">
-                    <h3>Logotipo</h3>
+                    <h3>Logo do Header</h3>
                 </div>
-                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Use PNG com fundo transparente para melhor resultado.</p>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Logo pequena exibida no canto superior esquerdo do site. Use PNG com fundo transparente.</p>
                 <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
                     ${siteData.logo
-                        ? `<img src="${siteData.logo}" style="height:50px;background:#233728;padding:8px;border-radius:4px;" alt="Logo">`
+                        ? `<img src="${siteData.logo}" style="height:40px;background:#233728;padding:6px;border-radius:4px;" alt="Logo Header">`
                         : `<span style="color:#999;font-size:0.85rem;">Nenhum logo enviado</span>`}
                     <input type="file" id="file-logo" accept="image/*" style="display:none" onchange="uploadLogoGlobal(event)">
-                    <button class="btn btn-sm" onclick="document.getElementById('file-logo').click()">Upload Logo</button>
+                    <button class="btn btn-sm" onclick="document.getElementById('file-logo').click()">Upload</button>
                     ${siteData.logo ? `<button class="btn btn-sm btn-danger" onclick="removeLogoGlobal()">Remover</button>` : ''}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Logo do Hero</h3>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Logo grande exibida no centro da tela inicial (Hero). Se não for enviada, será usada a logo do header.</p>
+                <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
+                    ${siteData.logoHero
+                        ? `<img src="${siteData.logoHero}" style="height:60px;background:#233728;padding:8px;border-radius:4px;" alt="Logo Hero">`
+                        : `<span style="color:#999;font-size:0.85rem;">Usando logo do header como fallback</span>`}
+                    <input type="file" id="file-logo-hero" accept="image/*" style="display:none" onchange="uploadLogoHero(event)">
+                    <button class="btn btn-sm" onclick="document.getElementById('file-logo-hero').click()">Upload</button>
+                    ${siteData.logoHero ? `<button class="btn btn-sm btn-danger" onclick="removeLogoHero()">Remover</button>` : ''}
                 </div>
             </div>
         </div>
@@ -920,6 +934,31 @@ async function removeLogoGlobal() {
     await saveContent(false);
     rebuildCurrentPanel('geral');
     showToast('Logo removido', 'info');
+}
+
+async function uploadLogoHero(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    showToast('Subindo logo do Hero...', 'info');
+    const formData = new FormData();
+    formData.append('photos', file);
+    try {
+        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success && data.files.length > 0) {
+            siteData.logoHero = data.files[0];
+            await saveContent(false);
+            rebuildCurrentPanel('geral');
+            showToast('Logo do Hero atualizada!', 'success');
+        }
+    } catch (err) { showToast('Erro no upload', 'error'); }
+}
+
+async function removeLogoHero() {
+    siteData.logoHero = '';
+    await saveContent(false);
+    rebuildCurrentPanel('geral');
+    showToast('Logo do Hero removida', 'info');
 }
 
 async function uploadHeroBg(e) {

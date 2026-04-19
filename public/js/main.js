@@ -17,6 +17,16 @@ function safeCssUrl(url) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // 0. Viewport real — mede a altura exata da janela visível no dispositivo
+    //    e injeta como variável CSS. Funciona em TODOS os celulares.
+    function setRealVh() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+    }
+    setRealVh();
+    window.addEventListener('resize', setRealVh);
+    window.addEventListener('orientationchange', () => setTimeout(setRealVh, 150));
+
     // 1. Initialize Lenis
     const lenis = new Lenis({
         duration: 1.2,
@@ -49,9 +59,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function populateDOM(data) {
-        // Logo images
-        const logoUrl = data.logo || '/images/placeholder.jpg';
-        document.querySelectorAll('.main-logo-img').forEach(el => el.src = logoUrl);
+        // Logo do header fixo (canto superior esquerdo)
+        const headerLogoUrl = data.logo || '/images/placeholder.jpg';
+        document.querySelectorAll('.fixed-ui .main-logo-img').forEach(el => el.src = headerLogoUrl);
+
+        // Logo do Hero (central, grande) — campo separado, com fallback para logo principal
+        const heroLogoUrl = data.logoHero || data.logo || '/images/placeholder.jpg';
+        document.querySelectorAll('.hero-content .main-logo-img').forEach(el => el.src = heroLogoUrl);
 
         // Hero background color (admin-controlled)
         const heroBgEl = document.querySelector('.hero-bg');

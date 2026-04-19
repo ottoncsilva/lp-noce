@@ -125,7 +125,7 @@ html {
 .section {
     position: relative;
     width: 100%;
-    min-height: 100dvh; /* Evita que o sumiço da barra do navegador deixe um buraco na tela no mobile */
+    min-height: calc(var(--real-vh, 1dvh) * 100); /* Altura real do viewport do dispositivo, medida via JS */
     overflow: hidden;
 }
 
