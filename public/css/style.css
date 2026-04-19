@@ -605,9 +605,145 @@ html {
 .lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; }
 
 /* === PROCESSO — TYPOGRAPHY FIX === */
-
 .proc-title {
     font-weight: 100;
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM FEATURES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1. LOADING SCREEN */
+.loader-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--noce-green);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.loader-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.loader-logo {
+    height: 12vw;
+    max-height: 80px;
+    width: auto;
+    object-fit: contain;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+}
+@keyframes loaderPulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+/* 2. SCROLL PROGRESS BAR */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.8));
+    z-index: 9999;
+    transition: width 0.1s linear;
+    pointer-events: none;
+}
+
+/* 6. SMART HEADER */
+.fixed-ui {
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+.fixed-ui.header-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+.fixed-ui .logo {
+    transition: filter 0.4s ease;
+}
+.fixed-ui.header-dark .logo {
+    filter: brightness(0) saturate(100%); /* Logo preta para seções claras */
+}
+
+/* 7. SECTION COLOR TRANSITIONS */
+.section-transition-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    pointer-events: none;
+    z-index: 5;
+}
+/* Verde → Branco */
+.acabamentos-sec .section-transition-top {
+    background: linear-gradient(to bottom, var(--noce-green), transparent);
+}
+/* Branco → Verde (Processo) */
+.processo .section-transition-top {
+    background: linear-gradient(to bottom, var(--noce-white), transparent);
+}
+/* FAQ → Verde (Contato) */
+.contato .section-transition-top {
+    background: linear-gradient(to bottom, var(--noce-white), transparent);
+}
+
+/* 8. SHIMMER NOS BOTÕES CTA */
+.btn-cta-final {
+    position: relative;
+    overflow: hidden;
+}
+.btn-cta-final::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.15),
+        transparent
+    );
+    animation: shimmer 4s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes shimmer {
+    0%, 75%, 100% { left: -100%; }
+    50% { left: 150%; }
+}
+
+/* 3. SPLIT TEXT — palavras individuais no manifesto */
+.word-reveal {
+    display: inline-block;
+    overflow: hidden;
+}
+.word-reveal span {
+    display: inline-block;
+}
+
+/* 4. CLIP-PATH REVEAL para swatches/imagens */
+.swatch-reveal {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+.swatch-reveal.revealed {
+    clip-path: inset(0 0 0 0);
+}
+
+/* 5. COUNTER ANIMADO */
+.counter-num {
+    font-variant-numeric: tabular-nums;
+}
+
+/* 10. LETTER SPACING ANIMATION */
+.ls-animate {
+    transition: letter-spacing 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }

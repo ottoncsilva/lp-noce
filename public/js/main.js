@@ -45,10 +45,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await response.json();
 
         populateDOM(data);
-        setTimeout(initAnimations, 100);
+        setTimeout(() => {
+            initAnimations();
+            initPremiumFeatures();
+            // 1. Dismiss loader — delay mínimo para não piscar
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if (loader) loader.classList.add('hidden');
+            }, 800);
+        }, 100);
     } catch (err) {
         console.error("Error loading content:", err);
-        // Show user-visible fallback so the page is not silently blank
+        // Dismiss loader even on error
+        const loader = document.getElementById('loader');
+        if (loader) loader.classList.add('hidden');
         const hero = document.querySelector('.hero');
         if (hero) {
             const notice = document.createElement('p');
@@ -480,5 +490,175 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
         }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PREMIUM FEATURES
+    // ═══════════════════════════════════════════════════════════════
+
+    function initPremiumFeatures() {
+
+        // ── 2. SCROLL PROGRESS BAR ──────────────────────────────
+        const progressBar = document.getElementById('scroll-progress');
+        if (progressBar) {
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                progressBar.style.width = progress + '%';
+            }, { passive: true });
+        }
+
+        // ── 3. SPLIT TEXT ANIMATION (Manifesto) ─────────────────
+        const manifestoBody = document.querySelector('.m-body');
+        if (manifestoBody && manifestoBody.textContent.trim()) {
+            const text = manifestoBody.textContent.trim();
+            const words = text.split(/\s+/);
+            manifestoBody.innerHTML = words.map(w =>
+                `<span class="word-reveal"><span>${w}</span></span>`
+            ).join(' ');
+
+            const wordSpans = manifestoBody.querySelectorAll('.word-reveal span');
+            gsap.from(wordSpans, {
+                scrollTrigger: {
+                    trigger: '.manifesto',
+                    start: 'top 60%',
+                },
+                y: 40,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.04,
+                ease: 'power3.out'
+            });
+        }
+
+        // ── 4. CLIP-PATH REVEAL (Materialidade swatches) ────────
+        const swatches = document.querySelectorAll('.acabamentos-wrapper .swatch, .acabamentos-wrapper > div');
+        swatches.forEach((swatch, i) => {
+            gsap.from(swatch, {
+                scrollTrigger: {
+                    trigger: swatch,
+                    start: 'top 85%',
+                },
+                clipPath: 'inset(0 100% 0 0)',
+                duration: 0.8,
+                delay: i * 0.08,
+                ease: 'power3.out',
+                clearProps: 'clipPath'
+            });
+        });
+
+        // ── 5. COUNTER ANIMADO ("17 anos") ──────────────────────
+        const ctaMidText = document.getElementById('cta-mid-text');
+        if (ctaMidText) {
+            const originalText = ctaMidText.textContent;
+            const numberMatch = originalText.match(/(\d+)/);
+            if (numberMatch) {
+                const target = parseInt(numberMatch[1]);
+                const prefix = originalText.substring(0, originalText.indexOf(numberMatch[0]));
+                const suffix = originalText.substring(originalText.indexOf(numberMatch[0]) + numberMatch[0].length);
+                
+                // Create counter span
+                const counterSpan = document.createElement('span');
+                counterSpan.className = 'counter-num';
+                counterSpan.textContent = '0';
+                ctaMidText.textContent = '';
+                ctaMidText.appendChild(document.createTextNode(prefix));
+                ctaMidText.appendChild(counterSpan);
+                ctaMidText.appendChild(document.createTextNode(suffix));
+
+                const counter = { val: 0 };
+                ScrollTrigger.create({
+                    trigger: '#cta-mid',
+                    start: 'top 70%',
+                    once: true,
+                    onEnter: () => {
+                        gsap.to(counter, {
+                            val: target,
+                            duration: 2,
+                            ease: 'power2.out',
+                            onUpdate: () => {
+                                counterSpan.textContent = Math.round(counter.val);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        // ── 6. SMART HEADER (Auto-hide + Cor Adaptativa) ────────
+        const fixedUI = document.querySelector('.fixed-ui');
+        if (fixedUI) {
+            let lastScroll = 0;
+            const THRESHOLD = 80;
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.scrollY;
+                
+                // Auto-hide: esconde ao rolar para baixo, mostra ao rolar para cima
+                if (currentScroll > THRESHOLD) {
+                    if (currentScroll > lastScroll) {
+                        fixedUI.classList.add('header-hidden');
+                    } else {
+                        fixedUI.classList.remove('header-hidden');
+                    }
+                } else {
+                    fixedUI.classList.remove('header-hidden');
+                }
+
+                // Cor adaptativa — checa em qual seção o topo da tela está
+                const sections = document.querySelectorAll('.section');
+                let inLightSection = false;
+                sections.forEach(sec => {
+                    const rect = sec.getBoundingClientRect();
+                    if (rect.top <= 60 && rect.bottom >= 60) {
+                        // Seções com fundo claro
+                        if (sec.classList.contains('acabamentos-sec') || 
+                            sec.classList.contains('faq-sec')) {
+                            inLightSection = true;
+                        }
+                    }
+                });
+
+                if (inLightSection) {
+                    fixedUI.classList.add('header-dark');
+                } else {
+                    fixedUI.classList.remove('header-dark');
+                }
+
+                lastScroll = currentScroll;
+            }, { passive: true });
+        }
+
+        // ── 9. PARALLAX NO HERO ─────────────────────────────────
+        const heroContent = document.querySelector('.hero-content');
+        if (heroContent) {
+            gsap.to(heroContent, {
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 0.5,
+                },
+                y: '20%',
+                opacity: 0.3,
+                ease: 'none'
+            });
+        }
+
+        // ── 10. LETTER SPACING ANIMATION ────────────────────────
+        const lsTargets = document.querySelectorAll('.section-entry-word, .parceiros-title, .faq-title, .proc-title');
+        lsTargets.forEach(el => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 80%',
+                },
+                letterSpacing: '0.3em',
+                opacity: 0,
+                duration: 1.2,
+                ease: 'power3.out'
+            });
+        });
     }
 });
