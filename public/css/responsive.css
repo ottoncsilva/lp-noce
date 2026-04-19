@@ -152,41 +152,37 @@
         text-align: center;
     }
 
-    /* ── MATERIALIDADE — Círculos dinâmicos ── */
+    /* ── MATERIALIDADE — Círculos dinâmicos mobile ── */
     .acabamentos-sec {
         min-height: auto;
+        padding: 8vh 0 10vh;
     }
     .acabamentos-wrapper {
-        min-height: auto;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         justify-items: center;
-        gap: 3vw;
-        padding: 0 5vw 3rem;
+        gap: 5vw;
+        padding: 0 5vw 2rem;
         width: 100%;
         overflow: visible;
     }
+    /* Reset do escalonamento vertical no mobile — grid 2 colunas já cria ritmo */
+    .swatch:nth-child(n) { margin-top: 0; }
+    /* Linhas pares levemente deslocadas para quebrar o grid simétrico */
+    .swatch:nth-child(4n+3),
+    .swatch:nth-child(4n+4) { margin-top: 4vw; }
+
     .swatch {
-        position: relative !important;
-        left: auto !important;
-        top: auto !important;
-        transform: none !important; /* block GSAP parallax on mobile */
-        border-radius: 50%;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-        width: 26vw;
-        height: 26vw;
+        width: 38vw;
+        height: 38vw;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
+    .swatch:active { transform: scale(0.96); }
     .swatch .name {
-        opacity: 1; /* always visible on mobile */
-        padding: 0.4rem 0.6rem;
-        font-size: 9px;
-        text-align: center;
-        background: rgba(0,0,0,0.45);
-        backdrop-filter: blur(6px);
-        color: var(--noce-white);
-        border-radius: 0 0 50% 50%;
-        letter-spacing: 0.08em;
+        padding: 0.4rem 0.5rem;
+        font-size: 8.5px;
+        letter-spacing: 0.06em;
     }
 }
 
@@ -230,8 +226,8 @@
 
 /* ── TABLET (769px–1024px) ───────────────────────────────────── */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
-    /* Swatches menores para caber sem overflow em telas médias */
-    .swatch { width: 200px; height: 300px; }
+    /* Swatches — tablet: manter layout flex com tamanho reduzido */
+    .swatch { width: clamp(100px, 13vw, 160px); height: clamp(100px, 13vw, 160px); }
 
     /* Botões do contato em coluna em tablet */
     .cta-btns {

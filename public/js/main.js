@@ -226,9 +226,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const procNarrative = document.getElementById('proc-narrative');
         if (procNarrative) {
             const defaultNarrative = 'Mais do que criar móveis, nós projetamos atmosferas. A nossa jornada começa com a Escuta — um mergulho profundo na sua rotina, nos seus desejos e na forma como você vivencia o seu lar. Com essa essência em mãos, partimos para uma rigorosa Curadoria, selecionando a dedo materiais e texturas de altíssimo padrão que refletem a sua identidade. Na fase de Projeto, aliamos tecnologia de precisão ao design autoral para modelar cada milímetro, garantindo perfeição técnica e estética. Por fim, a Entrega transcende a montagem: é o momento onde a sua nova realidade toma forma, superando o que um dia existiu apenas no papel.';
-            
-            if (data.processo && data.processo.items && data.processo.items.length > 0) {
-                // Compor narrativa a partir dos items da API
+
+            if (data.processo && data.processo.narrative && data.processo.narrative.trim()) {
+                // Narrativa personalizada via admin tem prioridade
+                procNarrative.textContent = data.processo.narrative;
+            } else if (data.processo && data.processo.items && data.processo.items.length > 0) {
+                // Gerar narrativa automaticamente a partir dos títulos das etapas
                 const titles = data.processo.items.map(i => escHtml(i.title));
                 const narrative = `Mais do que criar móveis, nós projetamos atmosferas. A nossa jornada começa com a ${titles[0] || 'Escuta'} — um mergulho profundo na sua rotina, nos seus desejos e na forma como você vivencia o seu lar. Com essa essência em mãos, partimos para uma rigorosa ${titles[1] || 'Curadoria'}, selecionando a dedo materiais e texturas de altíssimo padrão que refletem a sua identidade. Na fase de ${titles[2] || 'Projeto'}, aliamos tecnologia de precisão ao design autoral para modelar cada milímetro, garantindo perfeição técnica e estética. Por fim, a ${titles[3] || 'Entrega'} transcende a montagem: é o momento onde a sua nova realidade toma forma, superando o que um dia existiu apenas no papel.`;
                 procNarrative.textContent = narrative;
@@ -508,21 +511,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // ── 4. CLIP-PATH REVEAL (Materialidade swatches) ────────
-        const swatches = document.querySelectorAll('.acabamentos-wrapper .swatch, .acabamentos-wrapper > div');
-        swatches.forEach((swatch, i) => {
-            gsap.from(swatch, {
+        // ── 4. FADE + SCALE REVEAL (Materialidade swatches — mais rápido e fluido) ──
+        const swatches = document.querySelectorAll('.acabamentos-wrapper .swatch');
+        if (swatches.length > 0) {
+            gsap.from(swatches, {
                 scrollTrigger: {
-                    trigger: swatch,
-                    start: 'top 85%',
+                    trigger: '.acabamentos-wrapper',
+                    start: 'top 80%',
                 },
-                clipPath: 'inset(0 100% 0 0)',
-                duration: 0.8,
-                delay: i * 0.08,
-                ease: 'power3.out',
-                clearProps: 'clipPath'
+                scale: 0.7,
+                opacity: 0,
+                duration: 0.45,
+                stagger: { each: 0.04, from: 'start' },
+                ease: 'back.out(1.4)',
+                clearProps: 'scale,opacity'
             });
-        });
+        }
 
         // ── 5. COUNTER ANIMADO ("17 anos") ──────────────────────
         const ctaMidText = document.getElementById('cta-mid-text');
