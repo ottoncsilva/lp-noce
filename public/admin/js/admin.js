@@ -1034,21 +1034,8 @@ function positionFrameFromPercent(posStr, tab) {
 
     const canvasW = canvas.clientWidth;
     const canvasH = canvas.clientHeight || img.clientHeight;
-    const ratio   = CROP_RATIOS[tab];
-
-    // Frame dimensions
-    let fw, fh;
-    if (ratio >= 1) {
-        // Paisagem: largura máxima 80% do canvas
-        fw = canvasW * 0.8;
-        fh = fw / ratio;
-        if (fh > canvasH * 0.85) { fh = canvasH * 0.85; fw = fh * ratio; }
-    } else {
-        // Retrato: altura máxima 85% do canvas
-        fh = canvasH * 0.85;
-        fw = fh * ratio;
-        if (fw > canvasW * 0.7) { fw = canvasW * 0.7; fh = fw / ratio; }
-    }
+    // Frame dimensions (fixo em vez de aspect ratio falso, refletiria o alvo centralizado)
+    let fw = 60, fh = 60;
 
     frame.style.width  = fw + 'px';
     frame.style.height = fh + 'px';

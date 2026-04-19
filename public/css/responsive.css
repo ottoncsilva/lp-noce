@@ -134,15 +134,12 @@
         -webkit-overflow-scrolling: touch;
     }
     .gallery-item {
-        scroll-snap-align: center;
+        scroll-snap-align: start;
         height: 65vh;
-        width: auto; /* Mantém proporção original */
+        width: 100vw;
     }
     .gallery-item img {
-        height: 100%;
-        width: auto;
-        display: block;
-        object-fit: contain;
+        object-position: var(--pos-mob, center center);
     }
 
     /* Ajuste para as novas legendas não sumirem */
