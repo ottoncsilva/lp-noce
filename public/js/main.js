@@ -190,13 +190,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const wrapper = document.querySelector('.acabamentos-wrapper');
             let _swatchZCounter = 10;
             data.acabamentos.items.forEach((item, i) => {
-                // Tighter horizontal range so swatches cluster more (less dead space)
-                const left = 8 + Math.random() * 62;
-                const top = 5 + Math.random() * 120;
                 const bg = item.image ? `url(${item.image})` : '#333';
-
                 const swatchHTML = `
-                    <div class="swatch" style="left: ${left}%; top: ${top}%; background: ${bg}; background-size: cover; background-position: center;" data-speed="${0.5 + Math.random() * 1.5}">
+                    <div class="swatch" style="background: ${bg}; background-size: cover; background-position: center;">
                         <div class="name">${escHtml(item.name)}</div>
                     </div>
                 `;
@@ -400,23 +396,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
-        // 4. Acabamentos (Zero Gravity Parallax — desktop only)
-        mm.add("(min-width: 769px)", () => {
-            const swatches = document.querySelectorAll('.swatch');
-            swatches.forEach(swatch => {
-                const speed = swatch.getAttribute('data-speed');
-                gsap.to(swatch, {
-                    y: () => -100 * speed + "vh",
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: '.acabamentos-sec',
-                        start: "top bottom",
-                        end: "bottom top",
-                        scrub: 0.5
-                    }
-                });
-            });
-        });
+        // Zero Gravity removido para usar flex grid em todas as telas
 
         // 5. Parceiros (Spotlight)
         const logos = document.querySelectorAll('.parc-logo');
