@@ -552,29 +552,30 @@
     <div class="modal-overlay" id="crop-modal">
         <div class="modal" style="width:720px; max-width:96%; padding:1.5rem;">
             <h3 style="margin-bottom:0.25rem;">Enquadramento da Imagem</h3>
-            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Arraste o ALVO para marcar o ponto de maior importante da foto. A galeria preenche a tela toda sem bordas (fundo imersivo), e usará este alvo para garantir que o detalhe principal nunca seja cortado nos diferentes monitores.</p>
+            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Arraste o quadro tracejado sobre a foto para definir o que será visível em cada formato.</p>
             
             <!-- Tabs Desktop / Mobile -->
             <div style="display:flex; gap:8px; margin-bottom:1rem;">
                 <button id="crop-tab-desk" onclick="switchCropTab('desk')"
                     style="padding:6px 14px; border-radius:20px; border:1px solid var(--noce-green); background:var(--noce-green); color:#fff; font-size:0.8rem; cursor:pointer;">
-                    🖥 Foco Desktop / iPad
+                    🖥 Desktop / iPad
                 </button>
                 <button id="crop-tab-mob" onclick="switchCropTab('mob')"
                     style="padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:transparent; font-size:0.8rem; cursor:pointer;">
-                    📱 Foco Mobile
+                    📱 Mobile
                 </button>
             </div>
 
             <!-- Canvas area: imagem + frame arrastável -->
-            <div id="crop-canvas-wrap" style="position:relative; width:100%; max-height:60vh; background:#111; overflow-y:auto; overflow-x:hidden; user-select:none; touch-action:none; border-radius:8px;">
+            <div id="crop-canvas-wrap" style="position:relative; width:100%; background:#111; border-radius:8px; overflow:hidden; user-select:none; touch-action:none;">
                 <!-- Imagem completa -->
                 <img id="cp-full-img" src="" alt="" style="width:100%; height:auto; display:block; pointer-events:none;">
-                <!-- Frame de corte arrastável (ALVO) -->
+                <!-- Frame de corte arrastável -->
                 <div id="crop-frame"
-                    style="position:absolute; width: 60px; height: 60px; border:2px dashed #fff; border-radius:50%; box-shadow: 0 0 10px rgba(0,0,0,0.5); background: rgba(255,255,255,0.1); cursor:move; box-sizing:border-box; touch-action:none; display:flex; justify-content:center; align-items:center;">
-                    <div style="width: 8px; height: 8px; background: red; border-radius: 50%;"></div>
-                    <div style="position:absolute; top: -30px; background:rgba(0,0,0,0.8); color:#fff; font-size:0.7rem; padding:4px 10px; border-radius:20px; white-space:nowrap;" id="crop-label-hint"></div>
+                    style="position:absolute; border:3px dashed rgba(255,255,255,0.9); box-shadow:0 0 0 9999px rgba(0,0,0,0.45); cursor:move; box-sizing:border-box; touch-action:none;">
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                        <span style="background:rgba(0,0,0,0.4);color:#fff;font-size:0.7rem;padding:2px 6px;border-radius:4px;" id="crop-label-hint"></span>
+                    </div>
                 </div>
             </div>
 

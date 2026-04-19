@@ -190,9 +190,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const wrapper = document.querySelector('.acabamentos-wrapper');
             let _swatchZCounter = 10;
             data.acabamentos.items.forEach((item, i) => {
-                const bg = item.image ? `url(${item.image})` : '#333';
+                const imgHTML = item.image ? `<img src="${item.image}" loading="lazy" alt="${escHtml(item.name)}">` : '<div style="width:100%; height:100%; background:#333;"></div>';
                 const swatchHTML = `
-                    <div class="swatch" style="background: ${bg}; background-size: cover; background-position: center;">
+                    <div class="swatch">
+                        ${imgHTML}
                         <div class="name">${escHtml(item.name)}</div>
                     </div>
                 `;
@@ -221,12 +222,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Processo — Texto narrativo
         const procNarrative = document.getElementById('proc-narrative');
         if (procNarrative) {
-            const defaultNarrative = 'Tudo começa com a Escuta — onde entendemos seu estilo, rotina e desejos. A partir daí, a Curadoria seleciona materiais e acabamentos que traduzem a sua essência. O Projeto ganha forma em cada detalhe milimétrico. E a Entrega transforma o papel em realidade.';
+            const defaultNarrative = 'Mais do que criar móveis, nós projetamos atmosferas. A nossa jornada começa com a Escuta — um mergulho profundo na sua rotina, nos seus desejos e na forma como você vivencia o seu lar. Com essa essência em mãos, partimos para uma rigorosa Curadoria, selecionando a dedo materiais e texturas de altíssimo padrão que refletem a sua identidade. Na fase de Projeto, aliamos tecnologia de precisão ao design autoral para modelar cada milímetro, garantindo perfeição técnica e estética. Por fim, a Entrega transcende a montagem: é o momento onde a sua nova realidade toma forma, superando o que um dia existiu apenas no papel.';
             
             if (data.processo && data.processo.items && data.processo.items.length > 0) {
                 // Compor narrativa a partir dos items da API
                 const titles = data.processo.items.map(i => escHtml(i.title));
-                const narrative = `Tudo começa com a ${titles[0] || 'Escuta'} — onde entendemos seu estilo, rotina e desejos. A partir daí, a ${titles[1] || 'Curadoria'} seleciona materiais e acabamentos que traduzem a sua essência. O ${titles[2] || 'Projeto'} ganha forma em cada detalhe milimétrico. E a ${titles[3] || 'Entrega'} transforma o papel em realidade.`;
+                const narrative = `Mais do que criar móveis, nós projetamos atmosferas. A nossa jornada começa com a ${titles[0] || 'Escuta'} — um mergulho profundo na sua rotina, nos seus desejos e na forma como você vivencia o seu lar. Com essa essência em mãos, partimos para uma rigorosa ${titles[1] || 'Curadoria'}, selecionando a dedo materiais e texturas de altíssimo padrão que refletem a sua identidade. Na fase de ${titles[2] || 'Projeto'}, aliamos tecnologia de precisão ao design autoral para modelar cada milímetro, garantindo perfeição técnica e estética. Por fim, a ${titles[3] || 'Entrega'} transcende a montagem: é o momento onde a sua nova realidade toma forma, superando o que um dia existiu apenas no papel.`;
                 procNarrative.textContent = narrative;
             } else {
                 procNarrative.textContent = defaultNarrative;

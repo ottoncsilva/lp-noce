@@ -338,11 +338,12 @@ html {
 }
 .acabamentos-wrapper {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 2vw;
+    max-width: 1000px; /* keep it centered nicely */
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    gap: 4vw;
     padding: 0 5vw 4rem;
     background: transparent;
     overflow: visible;
