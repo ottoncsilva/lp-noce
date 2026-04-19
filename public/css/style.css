@@ -117,6 +117,15 @@ html.lenis { height: auto; }
     box-shadow: 0 6px 25px rgba(37,211,102,0.4);
 }
 
+/* TYPOGRAPHY SHARED */
+.section-title {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 100;
+    letter-spacing: 0.05em;
+    color: inherit;
+}
+
 /* SECTIONS */
 html {
     background-color: var(--noce-green); /* Cor de fundo base para o scroll bounce e gap do URL bar */
@@ -317,6 +326,7 @@ html {
 /* ACABAMENTOS (Amostras) */
 .acabamentos-sec {
     background: var(--noce-white);
+    color: var(--noce-black);
     padding: 10vh 0;
 }
 .section-entry-word {
@@ -357,7 +367,7 @@ html {
     color: var(--noce-white);
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     position: relative;
-    padding: 6vh 5vw;
+    padding: 10vh 5vw; /* Aumentado padding vertical para separar melhor de Parceiros */
 }
 .processo-content {
     max-width: 640px;
@@ -380,10 +390,6 @@ html {
 }
 .parceiros-title {
     text-align: center;
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 100; /* Hairline */
-    font-family: 'Aktiv Grotesk', sans-serif;
-    letter-spacing: 0.05em;
     padding: 0 5vw;
     margin-bottom: 3rem;
 }
@@ -516,10 +522,6 @@ html {
 }
 .faq-title {
     text-align: center;
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 100;
-    letter-spacing: 0.05em;
-    color: var(--noce-black);
     margin-bottom: 4rem;
 }
 .faq-list {
@@ -605,43 +607,8 @@ html {
 .lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; }
 
 /* === PROCESSO — TYPOGRAPHY FIX === */
-.proc-title {
-    font-weight: 100;
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    letter-spacing: 0.05em;
-}
 
-/* ═══════════════════════════════════════════════════════════════
-   PREMIUM FEATURES
-   ═══════════════════════════════════════════════════════════════ */
-
-/* 1. LOADING SCREEN */
-.loader-screen {
-    position: fixed;
-    inset: 0;
-    background: var(--noce-green);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
-}
-.loader-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-.loader-logo {
-    height: 12vw;
-    max-height: 80px;
-    width: auto;
-    object-fit: contain;
-    animation: loaderPulse 1.5s ease-in-out infinite;
-}
-@keyframes loaderPulse {
-    0%, 100% { opacity: 0.4; transform: scale(0.95); }
-    50% { opacity: 1; transform: scale(1); }
-}
+/* 1. LOADING SCREEN (REMOVIDO) */
 
 /* 2. SCROLL PROGRESS BAR */
 .scroll-progress {

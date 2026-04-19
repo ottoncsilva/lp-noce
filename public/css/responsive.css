@@ -69,6 +69,7 @@
     .parc-logo {
         width: 22vw;
         height: 22vw;
+        max-width: none !important;
         border-radius: 50%;
         object-fit: cover;
         background: none;
