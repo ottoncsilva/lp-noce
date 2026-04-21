@@ -485,9 +485,64 @@
             .content { padding: 1rem; }
             .item-row { flex-wrap: wrap; }
         }
+
+        /* === LOGIN OVERLAY === */
+        #login-overlay {
+            position: fixed; inset: 0;
+            background: var(--green);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        #login-box {
+            background: #fff; border-radius: 6px;
+            padding: 2.5rem 2rem; width: 100%; max-width: 340px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .login-brand { text-align: center; margin-bottom: 2rem; }
+        .login-brand h2 { font-size: 1.2rem; font-weight: 500; letter-spacing: 0.2em; color: var(--green); }
+        .login-brand p { font-size: 0.72rem; color: var(--text-light); letter-spacing: 0.08em; margin-top: 0.3rem; }
+        .login-field { margin-bottom: 0.9rem; }
+        .login-field input {
+            width: 100%; padding: 0.8rem 1rem;
+            border: 1px solid var(--border); border-radius: 4px;
+            font-family: var(--font); font-size: 0.9rem; color: var(--text);
+            outline: none; transition: border-color 0.2s;
+        }
+        .login-field input:focus { border-color: var(--green); }
+        #login-error { font-size: 0.78rem; color: var(--danger); min-height: 1.1em; margin-bottom: 0.6rem; }
+        .login-btn {
+            width: 100%; padding: 0.85rem;
+            background: var(--green); color: #fff;
+            border: none; border-radius: 4px;
+            font-family: var(--font); font-size: 0.82rem; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .login-btn:hover { background: var(--green-light); }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
+
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay">
+        <div id="login-box">
+            <div class="login-brand">
+                <h2>NOCE MOBILI</h2>
+                <p>Painel Administrativo</p>
+            </div>
+            <form id="login-form" onsubmit="doLogin(event)">
+                <div class="login-field">
+                    <input type="text" id="login-user" placeholder="Usuário" autocomplete="username" required>
+                </div>
+                <div class="login-field">
+                    <input type="password" id="login-pass" placeholder="Senha" autocomplete="current-password" required>
+                </div>
+                <div id="login-error"></div>
+                <button type="submit" class="login-btn" id="login-btn">Entrar</button>
+            </form>
+        </div>
+    </div>
 
     <!-- HAMBURGER (Mobile) -->
     <button class="hamburger" id="hamburger" aria-label="Menu">

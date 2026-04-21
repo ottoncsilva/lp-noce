@@ -5,6 +5,44 @@
 
 let siteData = {};
 let currentPanel = 'geral';
+let adminCreds = null;
+
+function authHeader() {
+    return adminCreds ? { 'Authorization': 'Basic ' + adminCreds } : {};
+}
+
+async function doLogin(event) {
+    event.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+    errEl.textContent = '';
+
+    const creds = btoa(user + ':' + pass);
+    try {
+        const res = await fetch('/api/auth', { headers: { 'Authorization': 'Basic ' + creds } });
+        if (res.ok) {
+            adminCreds = creds;
+            document.getElementById('login-overlay').style.display = 'none';
+            await fetchContent();
+            renderSidebar();
+            buildPanels();
+            activatePanel('geral');
+        } else {
+            errEl.textContent = 'Usuário ou senha incorretos.';
+            btn.disabled = false;
+            btn.textContent = 'Entrar';
+        }
+    } catch (err) {
+        errEl.textContent = 'Erro de conexão. Tente novamente.';
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+    }
+}
 
 // Debounced save — prevents rapid consecutive saves (e.g. typing in a caption field)
 let _saveDebounceTimer = null;
@@ -25,12 +63,9 @@ const POSITION_OPTIONS = [
     { value: 'center right',  label: 'Direita' },
 ];
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await fetchContent();
-    renderSidebar();
-    buildPanels();
-    activatePanel('geral');
+document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
+    setTimeout(() => document.getElementById('login-user').focus(), 100);
 });
 
 // ─────────────────────────────────────────────────────────────
@@ -125,22 +160,20 @@ function renderSidebar() {
             : Object.keys(siteData.sections || {});
 
         nav.innerHTML = `
-            <div class="nav-section-title">Configuração</div>
+            <div class="nav-section-title">Identidade</div>
             <button class="nav-item" data-target="geral" onclick="activatePanel('geral')">
-                ${iconGear()} Identidade
+                ${iconGear()} Logos & Favicon
             </button>
+
+            <div class="nav-section-title" style="margin-top:0.5rem;">Conteúdo</div>
             <button class="nav-item" data-target="hero" onclick="activatePanel('hero')">
                 ${iconImage()} Hero
             </button>
-            <button class="nav-item" data-target="conteudo" onclick="activatePanel('conteudo')">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> 
-                Conteúdo da Pág.
-            </button>
-            <button class="nav-item" data-target="config" onclick="activatePanel('config')">
-                ${iconSettings()} Contato
+            <button class="nav-item" data-target="manifesto" onclick="activatePanel('manifesto')">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                Manifesto
             </button>
 
-            <div class="nav-section-title" style="margin-top:0.5rem;">Ambientes</div>
             <div class="nav-group open" id="nav-group-ambientes">
                 <div class="nav-group-header">
                     <button class="nav-group-toggle" onclick="toggleNavGroup('nav-group-ambientes')">
@@ -157,18 +190,22 @@ function renderSidebar() {
                 </div>
             </div>
 
-            <div class="nav-section-title" style="margin-top:0.5rem;">Seções</div>
+            <button class="nav-item" data-target="acabamentos" onclick="activatePanel('acabamentos')">
+                ${iconPalette()} Materialidade
+            </button>
             <button class="nav-item" data-target="processo" onclick="activatePanel('processo')">
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
                 Nosso Processo
             </button>
-
-            <div class="nav-section-title" style="margin-top:0.5rem;">Catálogo</div>
-            <button class="nav-item" data-target="acabamentos" onclick="activatePanel('acabamentos')">
-                ${iconPalette()} Acabamentos
-            </button>
             <button class="nav-item" data-target="parceiros" onclick="activatePanel('parceiros')">
                 ${iconPartners()} Parceiros
+            </button>
+            <button class="nav-item" data-target="faq" onclick="activatePanel('faq')">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+                FAQ
+            </button>
+            <button class="nav-item" data-target="config" onclick="activatePanel('config')">
+                ${iconSettings()} Contato
             </button>
         `;
     } catch(err) {
@@ -202,8 +239,9 @@ function buildPanels() {
 
     buildGeralPanel(container);
     buildHeroPanel(container);
-    buildConteudoPanel(container);
+    buildManifestoPanel(container);
     buildConfigPanel(container);
+    buildFaqPanel(container);
 
     const order = siteData.sectionOrder || Object.keys(siteData.sections);
     order.forEach(secId => {
@@ -260,6 +298,13 @@ function buildHeroPanel(container) {
 
     container.insertAdjacentHTML('beforeend', `
         <div class="panel" id="panel-hero">
+            <div class="card">
+                <div class="card-header"><h3>Tagline</h3></div>
+                <div class="form-group">
+                    <label>Texto abaixo da logo no Hero</label>
+                    <input type="text" id="inp-tagline" value="${escHtml(siteData.tagline || '')}">
+                </div>
+            </div>
             <div class="card">
                 <div class="card-header"><h3>Cor de Fundo do Hero</h3></div>
                 <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">
@@ -385,8 +430,18 @@ function buildListPanel(container, secId, sec) {
         <div class="panel" id="panel-${secId}">
             <div class="card">
                 <div class="card-header"><h3>Informações</h3></div>
+                ${secId === 'acabamentos' ? `
                 <div class="form-group">
-                    <label>Título da Seção</label>
+                    <label>Palavra de destaque da seção (ex: MATERIALIDADE)</label>
+                    <input type="text" id="inp-txt-materialidade" value="${escHtml((siteData.texts || {}).materialidadeTitle || 'MATERIALIDADE')}">
+                </div>` : ''}
+                ${secId === 'parceiros' ? `
+                <div class="form-group">
+                    <label>Título da seção (ex: Parceiros)</label>
+                    <input type="text" id="inp-txt-parceiros" value="${escHtml((siteData.texts || {}).parceirosTitle || 'Parceiros')}">
+                </div>` : ''}
+                <div class="form-group">
+                    <label>Subtítulo</label>
                     <input type="text" id="inp-${secId}-head" value="${escHtml(headline)}">
                 </div>
             </div>
@@ -429,6 +484,54 @@ function buildItemRow(secId, item, idx) {
 }
 
 // ── Panel: Conteúdo (Textos, FAQ, Processo)
+function buildManifestoPanel(container) {
+    const t = siteData.texts || {};
+    container.insertAdjacentHTML('beforeend', `
+        <div class="panel" id="panel-manifesto">
+            <div class="card">
+                <div class="card-header"><h3>Manifesto</h3></div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="inp-man-head" value="${escHtml(siteData.manifesto ? siteData.manifesto.headline : '')}">
+                </div>
+                <div class="form-group">
+                    <label>Texto do corpo</label>
+                    <textarea id="inp-man-body">${escHtml(siteData.manifesto ? siteData.manifesto.body : '')}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Subtítulo (entre Manifesto e Ambientes)</label>
+                    <input type="text" id="inp-txt-midcta" value="${escHtml(t.midCta || '17 anos criando ambientes únicos')}">
+                </div>
+            </div>
+        </div>
+    `);
+}
+
+function buildFaqPanel(container) {
+    const t = siteData.texts || {};
+    const faq = siteData.faq ? (siteData.faq.items || []) : [];
+    container.insertAdjacentHTML('beforeend', `
+        <div class="panel" id="panel-faq">
+            <div class="card">
+                <div class="card-header"><h3>Perguntas Frequentes</h3></div>
+                <div class="form-group">
+                    <label>Título da seção</label>
+                    <input type="text" id="inp-txt-faq" value="${escHtml(t.faqTitle || 'Perguntas Frequentes')}">
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Perguntas</h3>
+                    <button class="btn btn-sm" onclick="addFaqItem()">+ Adicionar Pergunta</button>
+                </div>
+                <div id="faq-list">
+                    ${faq.map((item, idx) => buildConfigItemRow('faq', item, idx)).join('')}
+                </div>
+            </div>
+        </div>
+    `);
+}
+
 function buildConteudoPanel(container) {
     const t = siteData.texts || {};
     const faq = siteData.faq ? (siteData.faq.items || []) : [];
@@ -550,6 +653,10 @@ function buildConfigPanel(container) {
             </div>
             <div class="card">
                 <div class="card-header"><h3>WhatsApp & Contato</h3></div>
+                <div class="form-group">
+                    <label>Frase principal do CTA (ex: Vamos criar o seu ambiente?)</label>
+                    <input type="text" id="inp-cta-headline" value="${escHtml(cta.headline || '')}">
+                </div>
                 <div class="form-group">
                     <label>Número com DDI + DDD (ex: 5511965665065)</label>
                     <input type="text" id="inp-whatsapp" value="${escHtml(cta.whatsapp || '')}">
@@ -868,7 +975,7 @@ async function handleFiles(files, section) {
             setTimeout(() => progBar.style.width = '70%', 800);
         }
 
-        const res = await fetch(`/api/upload/${section}`, { method: 'POST', body: formData });
+        const res = await fetch(`/api/upload/${section}`, { method: 'POST', body: formData, headers: authHeader() });
         const data = await res.json();
 
         if (progBar) progBar.style.width = '100%';
@@ -902,7 +1009,7 @@ async function deleteImage(section, imgPath) {
     try {
         await fetch('/api/upload', {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
             body: JSON.stringify({ imagePath: imgPath })
         });
         siteData.sections[section].images = siteData.sections[section].images.filter(i => (i.src || i) !== imgPath);
@@ -938,7 +1045,7 @@ async function uploadItemImage(e, section, index) {
     const formData = new FormData();
     formData.append('photos', file);
     try {
-        const res = await fetch(`/api/upload/${section}`, { method: 'POST', body: formData });
+        const res = await fetch(`/api/upload/${section}`, { method: 'POST', body: formData, headers: authHeader() });
         const data = await res.json();
         if (data.success && data.files.length > 0) {
             const list = getItemList(section);
@@ -982,7 +1089,7 @@ async function uploadLogoGlobal(e) {
     const formData = new FormData();
     formData.append('photos', file);
     try {
-        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData });
+        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData, headers: authHeader() });
         const data = await res.json();
         if (data.success && data.files.length > 0) {
             siteData.logo = data.files[0];
@@ -1007,7 +1114,7 @@ async function uploadLogoHero(e) {
     const formData = new FormData();
     formData.append('photos', file);
     try {
-        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData });
+        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData, headers: authHeader() });
         const data = await res.json();
         if (data.success && data.files.length > 0) {
             siteData.logoHero = data.files[0];
@@ -1032,7 +1139,7 @@ async function uploadFavicon(e) {
     const formData = new FormData();
     formData.append('photos', file);
     try {
-        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData });
+        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData, headers: authHeader() });
         const data = await res.json();
         if (data.success && data.files.length > 0) {
             siteData.favicon = data.files[0];
@@ -1057,7 +1164,7 @@ async function uploadHeroBg(e) {
     const formData = new FormData();
     formData.append('photos', file);
     try {
-        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData });
+        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData, headers: authHeader() });
         const data = await res.json();
         if (data.success && data.files.length > 0) {
             siteData.heroBg = data.files[0];
@@ -1438,7 +1545,7 @@ async function saveContent(showMsg = true) {
     try {
         const res = await fetch('/api/content', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
             body: JSON.stringify(siteData)
         });
         if (!res.ok) throw new Error('Save failed');
@@ -1459,7 +1566,7 @@ async function addFaqItem() {
     if (!siteData.faq.items) siteData.faq.items = [];
     siteData.faq.items.push({ q: 'Nova Pergunta', a: 'Resposta...' });
     await saveContent(false);
-    rebuildCurrentPanel('conteudo');
+    rebuildCurrentPanel('faq');
 }
 
 async function addProcessoItem() {
@@ -1482,7 +1589,7 @@ async function deleteConfigItem(section, index) {
     if (siteData[section] && siteData[section].items) {
         siteData[section].items.splice(index, 1);
         await saveContent(false);
-        rebuildCurrentPanel(section === 'processo' ? 'processo' : 'conteudo');
+        rebuildCurrentPanel(section === 'processo' ? 'processo' : 'faq');
         showToast('Item removido', 'info');
     }
 }

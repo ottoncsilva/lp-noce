@@ -48,6 +48,11 @@ function ensureSectionDir(secId) {
 
 // ─── PUBLIC ROUTES ───────────────────────────────────────────
 
+// GET /api/auth — validate admin credentials
+router.get('/auth', protect, (req, res) => {
+    res.json({ ok: true });
+});
+
 // GET /api/content — site content (public)
 router.get('/content', (req, res) => {
     try {
