@@ -61,6 +61,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function populateDOM(data) {
+        // Favicon dinâmico
+        if (data.favicon) {
+            const faviconEl = document.querySelector('link[rel="icon"]');
+            const touchEl = document.querySelector('link[rel="apple-touch-icon"]');
+            if (faviconEl) faviconEl.href = data.favicon;
+            if (touchEl) touchEl.href = data.favicon;
+        }
+
         // Logo do header fixo (canto superior esquerdo)
         const headerLogoUrl = data.logo || '/images/placeholder.jpg';
         document.querySelectorAll('.fixed-ui .main-logo-img').forEach(el => el.src = headerLogoUrl);

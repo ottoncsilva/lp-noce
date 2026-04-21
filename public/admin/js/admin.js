@@ -537,6 +537,18 @@ function buildConfigPanel(container) {
     container.insertAdjacentHTML('beforeend', `
         <div class="panel" id="panel-config">
             <div class="card">
+                <div class="card-header"><h3>Favicon</h3></div>
+                <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem;">Ícone exibido na aba do navegador. Use PNG quadrado (recomendado 512×512px).</p>
+                <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
+                    ${siteData.favicon
+                        ? `<img src="${siteData.favicon}" style="width:32px;height:32px;object-fit:contain;background:#233728;padding:4px;border-radius:4px;" alt="Favicon">`
+                        : `<span style="color:#999;font-size:0.85rem;">Nenhum favicon enviado</span>`}
+                    <input type="file" id="file-favicon" accept="image/png,image/svg+xml,image/x-icon" style="display:none" onchange="uploadFavicon(event)">
+                    <button class="btn btn-sm" onclick="document.getElementById('file-favicon').click()">Upload</button>
+                    ${siteData.favicon ? `<button class="btn btn-sm btn-danger" onclick="removeFavicon()">Remover</button>` : ''}
+                </div>
+            </div>
+            <div class="card">
                 <div class="card-header"><h3>WhatsApp & Contato</h3></div>
                 <div class="form-group">
                     <label>Número com DDI + DDD (ex: 5511965665065)</label>
@@ -1011,6 +1023,31 @@ async function removeLogoHero() {
     await saveContent(false);
     rebuildCurrentPanel('geral');
     showToast('Logo do Hero removida', 'info');
+}
+
+async function uploadFavicon(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    showToast('Subindo favicon...', 'info');
+    const formData = new FormData();
+    formData.append('photos', file);
+    try {
+        const res = await fetch('/api/upload/corporativo', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success && data.files.length > 0) {
+            siteData.favicon = data.files[0];
+            await saveContent(false);
+            rebuildCurrentPanel('config');
+            showToast('Favicon atualizado!', 'success');
+        }
+    } catch (err) { showToast('Erro no upload', 'error'); }
+}
+
+async function removeFavicon() {
+    siteData.favicon = '';
+    await saveContent(false);
+    rebuildCurrentPanel('config');
+    showToast('Favicon removido', 'info');
 }
 
 async function uploadHeroBg(e) {
