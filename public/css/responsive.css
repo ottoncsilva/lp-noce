@@ -21,6 +21,7 @@
     .manifesto-wrap h2 {
         white-space: normal;
         line-height: 1.2;
+        font-size: 1.8rem;
     }
 
     /* ── CTA MID (Cola embaixo do manifesto, sem tela própria) ── */
@@ -97,6 +98,11 @@
         width: 100%;
         padding: 0 2rem;
         gap: 1rem;
+    }
+    .minimal-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
     }
 
     /* ── AMBIENTE ENTRY FIX ── */
