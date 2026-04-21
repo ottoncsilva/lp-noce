@@ -286,6 +286,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         const btnInsta = document.getElementById('btn-insta');
         if(btnInsta) btnInsta.href = `https://instagram.com/${cta.instagram || 'nocemobili'}`;
+
+        const footerAddr = document.getElementById('footer-address');
+        if(footerAddr) {
+            const loc = (data.localizacao && data.localizacao.endereco) || '';
+            footerAddr.textContent = loc;
+        }
     }
 
     function initAnimations() {

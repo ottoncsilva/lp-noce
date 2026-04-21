@@ -546,6 +546,10 @@ function buildConfigPanel(container) {
                     <label>@ do Instagram (sem o @)</label>
                     <input type="text" id="inp-instagram" value="${escHtml(cta.instagram || '')}">
                 </div>
+                <div class="form-group">
+                    <label>Endereço / Localização (exibido no rodapé)</label>
+                    <textarea id="inp-localizacao" rows="4" placeholder="Rua Exemplo, 123&#10;São Paulo, SP" style="width:100%;resize:vertical;font-family:inherit;">${escHtml((siteData.localizacao && siteData.localizacao.endereco) || '')}</textarea>
+                </div>
             </div>
         </div>
     `);
@@ -1367,6 +1371,10 @@ async function saveContent(showMsg = true) {
     if (insta) siteData.cta.instagram = insta.value;
     const ctaH = document.getElementById('inp-cta-headline');
     if (ctaH) siteData.cta.headline = ctaH.value;
+
+    if (!siteData.localizacao) siteData.localizacao = {};
+    const loc = document.getElementById('inp-localizacao');
+    if (loc) siteData.localizacao.endereco = loc.value;
 
     // Conteudos fields (Texts)
     if (!siteData.texts) siteData.texts = {};

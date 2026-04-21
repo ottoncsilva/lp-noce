@@ -204,7 +204,7 @@ html {
 }
 .manifesto-wrap h2 {
     font-weight: 300;
-    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    font-size: clamp(2.5rem, 4.8vw, 4.4rem);
     white-space: nowrap;
     padding: 0 0.5vw;
 }
@@ -215,7 +215,7 @@ html {
 }
 .m-body {
     max-width: 800px; 
-    font-size: clamp(1rem, 1.5vw, 1.5rem); 
+    font-size: clamp(1rem, 1.35vw, 1.35rem);
     line-height: 1.6;
     text-align: center;
     padding: 0 5vw;
@@ -374,7 +374,6 @@ html {
 .swatch img { width: 100%; height: 100%; object-fit: cover; }
 .swatch .name {
     position: absolute; bottom: 0; background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     color: var(--noce-white);
     width: 100%; padding: 0.65rem 0.5rem; font-size: 10px; opacity: 1;
     text-align: center; letter-spacing: 0.08em;
@@ -469,7 +468,7 @@ html {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 80px;
+    border-radius: 0;
     color: var(--noce-white);
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -487,7 +486,27 @@ html {
 .btn-cta-final svg {
     flex-shrink: 0;
 }
-.minimal-footer { position: relative; margin-top: 4rem; font-size: 10px; color: rgba(255,255,255,0.4); }
+.minimal-footer {
+    position: relative;
+    margin-top: 4rem;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+.footer-address {
+    font-style: normal;
+    font-weight: 300;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+    white-space: pre-line;
+    text-align: left;
+}
+.footer-address:empty { display: none; }
 
 /* === ACCESSIBILITY: Skip Link === */
 .skip-link {
@@ -531,6 +550,7 @@ html {
     display: inline-block;
     padding: 1.2rem 3rem;
     border: 1px solid var(--noce-green) !important;
+    border-radius: 0;
     color: var(--noce-green) !important;
     font-size: 12px;
     letter-spacing: 0.2em;

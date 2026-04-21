@@ -152,5 +152,8 @@
     "username": "nocemobili",
     "token": "",
     "show": true
+  },
+  "localizacao": {
+    "endereco": ""
   }
 }
